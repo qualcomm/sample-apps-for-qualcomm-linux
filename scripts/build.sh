@@ -104,7 +104,7 @@ function qimsdk-cmake-configure() {
 
     (
         export CFLAGS="-mbranch-protection=standard -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -pipe"
-        export CXXFLAGS="${CFLAGS}"
+        export CXXFLAGS="${CFLAGS} ${EXTRA_CXXFLAGS:-}"
 
         local CMAKE_FLAGS=(
             "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
@@ -147,8 +147,9 @@ function qimsdk-cmake-install() {
 function qimsdk-cmake-build() {
     local SOURCE_PATH="${1}"
     local TARGET=$(basename "${SOURCE_PATH}")
+    shift 1
 
-    qimsdk-cmake-configure "${SOURCE_PATH}" "${TARGET}" && \
+    qimsdk-cmake-configure "${SOURCE_PATH}" "${TARGET}" "$@" && \
     qimsdk-cmake-compile "${TARGET}" && \
     qimsdk-cmake-install "${TARGET}" && \
     qimsdk-print-build-success "${TARGET}"
@@ -187,21 +188,22 @@ function qimsdk-build-sample-apps() {
         1)
             # Build C Sample Apps from the array
             for APP in "${SAMPLE_APPS[@]}"; do
+                if [ "${APP}" = "gst-sample-apps-utils" ]; then
                 qimsdk-cmake-build "${REPO_PATH}/gst-sample-apps/${APP}" || return 1
 
-                    if [ "${APP}" = "gst-sample-apps-utils" ]; then
-                        mkdir -p "${SYSROOT_INCDIR}" "${SYSROOT_LIBDIR}" || return 1
+                mkdir -p "${SYSROOT_INCDIR}" "${SYSROOT_LIBDIR}" || return 1
 
-                        cp -vf \
-                            "${INSTALL_INCDIR}/gst_sample_apps_utils.h" \
-                            "${SYSROOT_INCDIR}/" || return 1
+                cp -vf \
+                    "${INSTALL_INCDIR}/gst_sample_apps_utils.h" \
+                    "${SYSROOT_INCDIR}/" || return 1
 
-                        cp -av \
-                            "${INSTALL_LIBDIR}/libgstappsutils.so"* \
-                            "${SYSROOT_LIBDIR}/" || return 1
-                        
-                    fi
-
+                cp -av \
+                    "${INSTALL_LIBDIR}/libgstappsutils.so"* \
+                    "${SYSROOT_LIBDIR}/" || return 1
+                else
+                    EXTRA_CXXFLAGS="-I${SYSROOT_INCDIR}" \
+                        qimsdk-cmake-build "${REPO_PATH}/gst-sample-apps/${APP}" || return 1
+                fi
             done
 
             echo "============================================================"
