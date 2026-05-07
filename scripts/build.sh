@@ -23,12 +23,13 @@ SAMPLE_APPS=(
    # "gst-appsink-example"
     "gst-sample-apps-utils"
     "gst-camera-single-stream-example"
+    "gst-multi-stream-example"
+   # "gst-snapshot-stream-example"
    # "gst-add-remove-streams-runtime"
-   # "gst-add-streams-as-bundle-example"
+    "gst-multi-camera-example"
    # "gst-ai-classification"
    # "gst-ai-face-detection"
    # "gst-camera-single-stream-example"
-   # "GstD-camera-single-stream-example"
    # "gst-video-playback-example"
    # "gst-video-transcode-example"
 )
@@ -41,7 +42,7 @@ show_help() {
     echo "  -l, --list    List available sample apps"
     echo
     echo "To edit the sample app list:"
-    echo "  - For C sample apps, edit SAMPLE_APPS in this script"
+    echo "  - For C/C++ sample apps, edit SAMPLE_APPS in this script"
     echo "  - For Python sample apps, edit gst-plugins-imsdk/gst-python-examples/CMakeLists.txt"
     echo
     echo "Available sample apps:"
@@ -103,7 +104,7 @@ function qimsdk-cmake-configure() {
     local CMAKE_CUSTOM_CONFIG_FLAGS=("$@")
 
     (
-        export CFLAGS="-mbranch-protection=standard -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -pipe"
+        export CFLAGS="-mbranch-protection=standard -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -pipe ${EXTRA_CFLAGS:-}"
         export CXXFLAGS="${CFLAGS} ${EXTRA_CXXFLAGS:-}"
 
         local CMAKE_FLAGS=(
@@ -201,6 +202,7 @@ function qimsdk-build-sample-apps() {
                     "${INSTALL_LIBDIR}/libgstappsutils.so"* \
                     "${SYSROOT_LIBDIR}/" || return 1
                 else
+		    EXTRA_CFLAGS="-I${SYSROOT_INCDIR}" \
                     EXTRA_CXXFLAGS="-I${SYSROOT_INCDIR}" \
                         qimsdk-cmake-build "${REPO_PATH}/gst-sample-apps/${APP}" || return 1
                 fi
