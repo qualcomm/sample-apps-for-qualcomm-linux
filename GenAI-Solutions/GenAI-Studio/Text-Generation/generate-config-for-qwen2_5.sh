@@ -45,7 +45,7 @@ case "$soc_name" in
 esac
 
 echo "Detected : $DEV"
-echo "   -> Internal Model : $HTP_SOC_MODEL"
+echo "   -> Model : $HTP_SOC_MODEL"
 echo "   -> DSP Arch       : $DSP_ARCH"
 
 # =============================================================================
