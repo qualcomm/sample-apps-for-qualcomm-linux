@@ -39,7 +39,7 @@ RUN wget https://github.com/CrowCpp/Crow/releases/download/v1.2.1.2/Crow-1.2.1-L
     echo "Building for $DSP_ARCH" && \
     wget https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/${QAIRT_VER}/v${QAIRT_VER}.zip && \
     unzip v${QAIRT_VER}.zip && \
-    mkdir -p build && cd build && cmake .. && make -j8 && \
+    mkdir -p build && cd build && cmake .. -DQAIRT_VER=${QAIRT_VER} && make -j8 && \
     cp chat_app /usr/bin/ && chmod +x /usr/bin/chat_app && \
     mkdir -p /usr/lib/rfsa/adsp && \
     # Use variables to copy the correct files

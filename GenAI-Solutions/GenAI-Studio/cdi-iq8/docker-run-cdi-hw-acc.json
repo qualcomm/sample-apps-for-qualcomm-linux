@@ -713,21 +713,21 @@
             ]
           },
           {
-            "hostPath": "/usr/lib/rfsa/adsp/libCalculator_skel.so",
+            "hostPath": "/usr/lib/rfsa/adsp/hexagon-v75/libCalculator_skel.so",
             "containerPath": "/usr/lib/rfsa/adsp/hexagon-v75/libCalculator_skel.so",
             "options": [
               "bind"
             ]
           },
           {
-            "hostPath": "/usr/lib/rfsa/adsp/libQnnSaver.so",
+            "hostPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSaver.so",
             "containerPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSaver.so",
             "options": [
               "bind"
             ]
           },
           {
-            "hostPath": "/usr/lib/rfsa/adsp/libQnnSystem.so",
+            "hostPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSystem.so",
             "containerPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSystem.so",
             "options": [
               "bind"

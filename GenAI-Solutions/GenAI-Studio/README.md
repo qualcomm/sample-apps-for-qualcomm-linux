@@ -116,29 +116,11 @@ sudo chown -R ubuntu:ubuntu /opt/
 
 #### Validate Qualcomm NPU
 ```
-snpe-platform-validator --runtime dsp
+qnn-platform-validator --runtime dsp
 ```
 #### Expected output
 ![DSP_Runtime](./assets/dsp_runtime.png)
 > "DSP Passed" from above log ensures DSP runtime is supported on device
-
-**NOTE:**
-For IQ8 please sideload QAIRT 2.44:
-
-Download the SDK
-```
-wget https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/2.44.0.260225/v2.44.0.260225.zip && unzip v2.44.0.260225.zip
-```
-Push the files to their respective folders
-```
-cp qairt/2.44.0.260225/lib/hexagon-v75/unsigned/* /usr/lib/rfsa/adsp/ && \
-cp qairt/2.44.0.260225/lib/aarch64-oe-linux-gcc11.2/* /usr/lib/ && \
-cp qairt/2.44.0.260225/bin/aarch64-oe-linux-gcc11.2/* /usr/bin/
-```
->Re-run snpe-platform-validator to check if it was successful
-```
-snpe-platform-validator --runtime dsp
-```
 
 #### Docker Installation
 ##### Follow below steps to install Docker and dependencies
@@ -388,6 +370,7 @@ scp -r genie_bundle root@<target-ip-address>:/opt/
 ```
 > Qualcomm Linux Default password: oelinux123
 #### NOTE: For qwen, if your folder does not include genie_config.json, htp_backend_ext_config.json or tokenizer.json. Please run the script [generate-config-for-qwen2_5.sh](Text-Generation\generate-config-for-qwen2_5.sh) in your /opt/qwen_bundle folder on the target device.
+#### NOTE: Generate the models using the same QAIRT version as used in the Docker image. 
 >For Qualcomm Ubuntu
 ##### On the target device
 ```

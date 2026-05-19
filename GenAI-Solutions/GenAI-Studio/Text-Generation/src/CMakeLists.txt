@@ -37,7 +37,7 @@ set(ASIO_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/asio/asio)
 
 # QNN SDK paths
 set(CHIPSET "QCS8275")
-set(QNN_ROOT "/app/Text-Generation/src/qairt/2.42.0.251225")
+set(QNN_ROOT "/app/Text-Generation/src/qairt/${QAIRT_VER}")
 set(QNN_INCLUDE_DIR "${QNN_ROOT}/include/Genie")
 set(QNN_LIB_PREFIX "${QNN_ROOT}/lib")
 set(_dtuple_POSTFIX "oe-linux-gcc11.2")

@@ -38,7 +38,7 @@ RUN if [ "$DSP_ARCH" = "v75" ]; then \
         EXTRA_CMAKE="--cmake_extra_defines onnxruntime_USE_KLEIDIAI=OFF onnxruntime_USE_SVE=OFF"; \
     else \
         HEX_FOLDER="hexagon-v73"; \
-        EXTRA_CMAKE=""
+        EXTRA_CMAKE=""; \
     fi && \
     \
     # 1. Setup QAIRT
