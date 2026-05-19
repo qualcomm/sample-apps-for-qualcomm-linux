@@ -95,7 +95,7 @@ sudo apt install -y qcom-fastrpc1 qcom-libdmabufheap-dev qcom-fastrpc-dev qcom-d
 
 Learn more about [QNN](https://docs.qualcomm.com/bundle/publicresource/topics/80-63442-10/index_QNN.html) and [SNPE](https://docs.qualcomm.com/bundle/publicresource/topics/80-63442-10/index_SNPE.html)
 #### CDI setup
-> CDI stands for Container Device Interface. provides a interface that allows containers to access Qualcomm DSP or GPU resources 
+> CDI stands for Container Device Interface. provides an interface that allows containers to access Qualcomm DSP or GPU resources 
 ```
 curl -L -O https://git.codelinaro.org/clo/le/sdk-tools/-/raw/imsdk-tools.lnx.1.0.r1-rel/qimsdk-ubuntu/scripts/generate_cdi_json.sh?ref_type=heads&inline=false
 ```
@@ -107,7 +107,7 @@ bash generate_cdi_json.sh
 ```
 ls /etc/cdi/docker-run-cdi-hw-acc.json
 ```
-#### Replace "/etc/cdi/docker-run-cdi-hw-acc.json" with [docker-run-cdi-hw-acc.json](docker-run-cdi-hw-acc.json) from this folder
+#### Replace "/etc/cdi/docker-run-cdi-hw-acc.json" with [docker-run-cdi-hw-acc.json](cdi-iq9/docker-run-cdi-hw-acc.json) from this folder for IQ9 and [docker-run-cdi-hw-acc.json](cdi-iq8/docker-run-cdi-hw-acc.json)
 
 > Modify permissions of /opt/ folder to access artifacts
 ```
@@ -116,7 +116,7 @@ sudo chown -R ubuntu:ubuntu /opt/
 
 #### Validate Qualcomm NPU
 ```
-snpe-platform-validator --runtime dsp
+qnn-platform-validator --runtime dsp
 ```
 #### Expected output
 ![DSP_Runtime](./assets/dsp_runtime.png)
@@ -189,6 +189,9 @@ git clone https://github.com/quic/sample-apps-for-qualcomm-linux.git
 cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 ```
 ##### NOTE: Generating container image depends on network connection and can take more than 30 minutes each
+##### NOTE: Use dsp-architecture = v73 for IQ9 and v75 for IQ8
+##### NOTE: The QAIRT sdk version used can be changed using --build-arg QAIRT_VER=<version> during build for Text-Generation, Image-Generation and Text-to-Speech. 
+###### Please note that only the default versions of QAIRT sdk have been validated.
 > Speech-To-Text
 ```
 cd Speech-To-Text
@@ -199,14 +202,14 @@ cd ..
 > Text-Generation
 ```
 cd Text-Generation
-docker  build --progress=plain -t text2text . 
+docker  build --progress=plain --build-arg DSP_ARCH=<dsp-architecture> -t text2text . 
 docker save text2text -o text2text
 cd ..
 ```
 > Text-To-Speech
 ```
 cd Text-To-Speech/meloTTS/
-docker  build --progress=plain -t text2speech . 
+docker  build --progress=plain --build-arg DSP_ARCH=<dsp-architecture> -t text2speech . 
 docker save text2speech -o text2speech
 cd ..
 ```
@@ -214,7 +217,7 @@ cd ..
 
 ```
 cd Image-Generation
-docker  build --progress=plain -t text2image . 
+docker  build --progress=plain --build-arg DSP_ARCH=<dsp-architecture> -t text2image . 
 docker save text2image -o text2image
 cd ..
 ```
@@ -257,6 +260,9 @@ git clone https://github.com/quic/sample-apps-for-qualcomm-linux.git
 cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 ```
 ##### NOTE: Generating container image depends on network connection and can take more than 30 minutes each
+##### NOTE: Use dsp-architecture = v73 for IQ9 and dsp-architecture v75 for IQ8
+##### NOTE: The QAIRT sdk version used can be changed using --build-arg QAIRT_VER=<version> during build for Text-Generation, Image-Generation and Text-to-Speech. 
+###### Please note that only the default versions of QAIRT sdk have been validated.
 > Speech-To-Text
 ```
 cd Speech-To-Text
@@ -267,14 +273,14 @@ cd ..
 > Text-Generation
 ```
 cd Text-Generation
-docker  build --progress=plain --platform=linux/arm64/v8  -t text2text .
+docker  build --progress=plain --platform=linux/arm64/v8 --build-arg DSP_ARCH=<dsp-architecture> -t text2text .
 docker save text2text -o text2text
 cd ..
 ```
 > Text-To-Speech
 ```
 cd Text-To-Speech/meloTTS/
-docker  build --progress=plain --platform=linux/arm64/v8  -t text2speech .
+docker  build --progress=plain --platform=linux/arm64/v8  --build-arg DSP_ARCH=<dsp-architecture> -t text2speech .
 docker save text2speech -o text2speech
 cd ..
 ```
@@ -282,7 +288,7 @@ cd ..
 
 ```
 cd Image-Generation
-docker  build --progress=plain --platform=linux/arm64/v8  -t text2image .
+docker  build --progress=plain --platform=linux/arm64/v8  --build-arg DSP_ARCH=<dsp-architecture> -t text2image .
 docker save text2image -o text2image
 cd ..
 ```
@@ -331,10 +337,24 @@ Follow [Generate Models](#generate-models) for next steps
 Follow https://github.com/quic/ai-hub-apps/tree/main/tutorials/llm_on_genie
 
 > Export model
+#### Llama v3
 ```
+#For IQ9
 python -m qai_hub_models.models.llama_v3_8b_instruct.export --chipset qualcomm-snapdragon-x-elite --skip-inferencing --skip-profiling --output-dir genie_bundle
+
+#For IQ8
+python -m qai_hub_models.models.llama_v3_8b_instruct.export --chipset qualcomm-snapdragon-8gen3 --skip-inferencing --skip-profiling --output-dir genie_bundle
 ```
-##### NOTE: The export command may take 2–3 hours and requires significant memory (RAM + swap) on the host.
+#### Qwen 2.5
+```
+#For IQ9
+python -m qai_hub_models.models.qwen2_5_7b_instruct.export --chipset qualcomm-qcs9075 --skip-inferencing --skip-profiling --output-dir genie_bundle
+
+#For IQ8
+python -m qai_hub_models.models.qwen2_5_7b_instruct.export --chipset qualcomm-qcs8275-proxy --skip-inferencing --skip-profiling --output-dir genie_bundle
+```
+##### NOTE: The export command may take 2–3 hours and requires significant memory (RAM + swap) on the host. 
+
 > Push models folder genie_bundle to "/opt/" on target device
 
 Follow [Setup](https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/how_to.html?vproduct=1601111740013072&version=1.5#setup) to get IP address
@@ -349,13 +369,35 @@ scp -r genie_bundle ubuntu@<target-ip-address>:/opt/
 scp -r genie_bundle root@<target-ip-address>:/opt/
 ```
 > Qualcomm Linux Default password: oelinux123
+#### NOTE: For qwen, if your folder does not include genie_config.json, htp_backend_ext_config.json or tokenizer.json. Please run the script [generate-config-for-qwen2_5.sh](Text-Generation\generate-config-for-qwen2_5.sh) in your /opt/qwen_bundle folder on the target device.
+#### NOTE: Generate the models using the same QAIRT version as used in the Docker image. 
+>For Qualcomm Ubuntu
+##### On the target device
+```
+cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio/Text-Generation/
+cp generate-config-for-qwen2_5.sh /opt/qwen_bundle
+cd /opt/qwen_bundle
+bash generate-config-for-qwen2_5.sh
+```
+>For Qualcomm Linux
+##### On the host machine
+```
+cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio/Text-Generation/
+scp generate-config-for-qwen2_5 root@<target-ip-address>:/opt/qwen_bundle
+```
+> Qualcomm Linux Default password: oelinux123
+##### On the target device
+```
+cd /opt/qwen_bundle
+bash generate-config-for-qwen2_5.sh
+```
 
 #### Text To Speech
-As TTS models are not distributed, Please install  https://qpm.qualcomm.com/#/main/tools/details/VoiceAI_TTS and follow "VoiceAI_TTS/1.0.1.0/notebook/melo/npu/README.md" to generate models
+As TTS models are not distributed for IQ8, Please install  https://qpm.qualcomm.com/#/main/tools/details/VoiceAI_TTS and follow "VoiceAI_TTS/1.0.1.0/notebook/melo/npu/README.md" to generate models
 
 **NOTE:** 
-* Use QAIRT 2.38 version
-* Use v73 dsp arch for IQ9
+* Use QAIRT 2.44
+* Use v73 dsp arch for IQ9 and v75 dsp arch for IQ8
 > Add below commands in **Melo-Notebook.ipynb** Jupyter notebook to generate qnn_ctx onnx models
 ```
 wget https://raw.githubusercontent.com/microsoft/onnxruntime/main/onnxruntime/python/tools/qnn/gen_qnn_ctx_onnx_model.py
@@ -371,6 +413,14 @@ for file_name in os.listdir(output_path):
     
     !python gen_qnn_ctx_onnx_model.py -b {os.path.join(output_path,file_name)} -q {os.path.join(intermediates_path,net_json_file)}
 ```
+You can also download the models directly from [aihub](https://aihub.qualcomm.com/models/melotts_en?searchTerm=melo).
+#### NOTE: download the models for onnx runtime and rename your onnx files to:
+```
+bert_net_qnn_ctx.onnx  
+decoder_net_qnn_ctx.onnx  
+encoder_net_qnn_ctx.onnx  
+flow_net_qnn_ctx.onnx
+```
 > Push models to "/opt/TTS_models/" on target device
 
 > For Qualcomm Ubuntu
@@ -383,6 +433,7 @@ scp -r TTS_models ubuntu@<target-ip-address>:/opt/
 scp -r TTS_models root@<target-ip-address>:/opt/
 ```
 > Default password: oelinux123
+
 
 Follow [Run applications](#run-applications) for next steps
 
@@ -411,7 +462,7 @@ docker-compose -f docker-compose.yml up -d
 },
 ```
 
-If there are any other errors use "**[docker-run-cdi-hw-acc.json](docker-run-cdi-hw-acc.json)**" 
+If there are any other errors use the "docker-run-cdi-hw-acc.json" suitable for your target device. 
 
 > Network URL
 ```

@@ -10,6 +10,8 @@ services:
     user: root
     restart: always
     command: bash run.sh
+    volumes:
+      - /opt/genie_bundle:/opt/genie_bundle
     deploy:
       resources:
         reservations:

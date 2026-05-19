@@ -1,0 +1,789 @@
+{
+  "cdiVersion": "0.6.0",
+  "kind": "qualcomm.com/device",
+  "devices": [
+    {
+      "name": "cdi-hw-acc",
+      "containerEdits": {
+        "env": [
+          "XDG_RUNTIME_DIR=/run/user/1000",
+          "WAYLAND_DISPLAY=wayland-0",
+          "GST_DEBUG_NO_COLOR=1",
+          "GST_DEBUG=2",
+          "GST_PLUGIN_SCANNER=\"/usr/lib/aarch64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner\""
+        ],
+        "deviceNodes": [
+          {
+            "path": "/dev/dri/card0",
+            "fileMode": 438
+          },
+          {
+            "path": "/dev/dri/renderD128",
+            "fileMode": 438
+          },
+          {
+            "path": "/dev/kgsl-3d0",
+            "fileMode": 438
+          },
+          {
+            "path": "/dev/video32",
+            "fileMode": 438
+          },
+          {
+            "path": "/dev/video33",
+            "fileMode": 438
+          },
+          {
+            "path": "/dev/dma_heap/system",
+            "fileMode": 438
+          },
+          {
+            "path": "/dev/dma_heap/qcom,system",
+            "fileMode": 438
+          },
+          {
+            "path": "/dev/fastrpc-cdsp",
+            "fileMode": 438
+          }
+        ],
+        "mounts": [
+          {
+            "hostPath": "/run/user/1000",
+            "containerPath": "/run/user/1000",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/tmp/property-vault.socket",
+            "containerPath": "/tmp/property-vault.socket",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/etc/labels",
+            "containerPath": "/etc/labels",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/etc/media",
+            "containerPath": "/etc/media",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/etc/models",
+            "containerPath": "/etc/models",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/etc/configs",
+            "containerPath": "/etc/configs",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/ml",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/ml",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/mlmetaparser",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/mlmetaparser",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/pulseaudio",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/pulseaudio",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gbm/default_fmt_alignment.xml",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gbm/default_fmt_alignment.xml",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gbm/dri_gbm.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gbm/msm_gbm.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gbm/msm_gbm.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstcoreelements.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstcoreelements.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstqtimlmetaparser.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstqtimlmetaparser.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstqtimlvpose.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstqtimlvpose.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libCB.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libCB.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libEGL.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libEGL.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libEGL_adreno.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libEGL_adreno.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libGLESv1_CM.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libGLESv1_CM.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libGLESv1_CM_adreno.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libGLESv1_CM_adreno.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libGLESv2.so.2",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libGLESv2.so.2",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libGLESv2_adreno.so.2",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libGLESv2_adreno.so.2",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libOpenCL.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libOpenCL.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libOpenCL_adreno.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libOpenCL_adreno.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libadreno_utils.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libadreno_utils.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libadsprpc.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libadsprpc.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libatomic.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libatomic.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libcdsprpc.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libcdsprpc.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libdmabufheap.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libdmabufheap.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libeglSubDriverWayland.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libeglSubDriverWayland.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libfastcvdsp_stub.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libfastcvdsp_stub.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libfastcvopt.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libfastcvopt.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.1.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.1.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgbm.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgbm.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgsl.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgsl.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstbase-1.0.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstbase-1.0.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstqtiallocatorsbase.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstqtiallocatorsbase.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstqticvbase.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstqticvbase.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstqtigfxbase.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstqtigfxbase.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstqtimemorybase.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstqtimemorybase.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstqtimlbase.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstqtimlbase.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstqtiutilsbase.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstqtiutilsbase.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstqtivideobase.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstqtivideobase.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstreamer-1.0.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstreamer-1.0.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libgstvideo-1.0.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libllvm-glnext.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libllvm-glnext.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libllvm-qcom.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libllvm-qcom.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libllvm-qgl.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libllvm-qgl.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libpropertyvault.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libpropertyvault.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libpulse-simple.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libpulse-simple.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libpulse.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libpulse.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libq3dtools_adreno.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libq3dtools_adreno.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libq3dtools_esx.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libq3dtools_esx.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libvulkan_adreno.so.1",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libvulkan_adreno.so.1",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libwayland-client.so.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libwayland-client.so.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/dsp/cdsp/cv/v75/MONACO/libfastcvadsp.so",
+            "containerPath": "/usr/lib/dsp/cdsp/cv/v75/MONACO/libfastcvadsp.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/dsp/cdsp/cv/v75/MONACO/libfastcvdsp_skel.so",
+            "containerPath": "/usr/lib/dsp/cdsp/cv/v75/MONACO/libfastcvdsp_skel.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libPlatformValidatorShared.so",
+            "containerPath": "/usr/lib/libPlatformValidatorShared.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnChrometraceProfilingReader.so",
+            "containerPath": "/usr/lib/libQnnChrometraceProfilingReader.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnCpu.so",
+            "containerPath": "/usr/lib/libQnnCpu.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnCpuNetRunExtensions.so",
+            "containerPath": "/usr/lib/libQnnCpuNetRunExtensions.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnDsp.so",
+            "containerPath": "/usr/lib/libQnnDsp.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnDspNetRunExtensions.so",
+            "containerPath": "/usr/lib/libQnnDspNetRunExtensions.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnGenAiTransformer.so",
+            "containerPath": "/usr/lib/libQnnGenAiTransformer.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnGenAiTransformerCpuOpPkg.so",
+            "containerPath": "/usr/lib/libQnnGenAiTransformerCpuOpPkg.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnGenAiTransformerModel.so",
+            "containerPath": "/usr/lib/libQnnGenAiTransformerModel.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnGpu.so",
+            "containerPath": "/usr/lib/libQnnGpu.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnGpuNetRunExtensions.so",
+            "containerPath": "/usr/lib/libQnnGpuNetRunExtensions.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnGpuProfilingReader.so",
+            "containerPath": "/usr/lib/libQnnGpuProfilingReader.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHta.so",
+            "containerPath": "/usr/lib/libQnnHta.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtaNetRunExtensions.so",
+            "containerPath": "/usr/lib/libQnnHtaNetRunExtensions.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtp.so",
+            "containerPath": "/usr/lib/libQnnHtp.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtpNetRunExtensions.so",
+            "containerPath": "/usr/lib/libQnnHtpNetRunExtensions.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtpOptraceProfilingReader.so",
+            "containerPath": "/usr/lib/libQnnHtpOptraceProfilingReader.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtpPrepare.so",
+            "containerPath": "/usr/lib/libQnnHtpPrepare.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtpProfilingReader.so",
+            "containerPath": "/usr/lib/libQnnHtpProfilingReader.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtpV75CalculatorStub.so",
+            "containerPath": "/usr/lib/libQnnHtpV75CalculatorStub.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnHtpV75Stub.so",
+            "containerPath": "/usr/lib/libQnnHtpV75Stub.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnIr.so",
+            "containerPath": "/usr/lib/libQnnIr.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnJsonProfilingReader.so",
+            "containerPath": "/usr/lib/libQnnJsonProfilingReader.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnLpai.so",
+            "containerPath": "/usr/lib/libQnnLpai.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnLpaiNetRunExtensions.so",
+            "containerPath": "/usr/lib/libQnnLpaiNetRunExtensions.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnLpaiProfilingReader.so",
+            "containerPath": "/usr/lib/libQnnLpaiProfilingReader.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnModelDlc.so",
+            "containerPath": "/usr/lib/libQnnModelDlc.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnSaver.so",
+            "containerPath": "/usr/lib/libQnnSaver.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnSystem.so",
+            "containerPath": "/usr/lib/libQnnSystem.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libQnnTFLiteDelegate.so",
+            "containerPath": "/usr/lib/libQnnTFLiteDelegate.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libSNPE.so",
+            "containerPath": "/usr/lib/libSNPE.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libSnpeDspStub.so",
+            "containerPath": "/usr/lib/libSnpeDspStub.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libSnpeHta.so",
+            "containerPath": "/usr/lib/libSnpeHta.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libSnpeHtpPrepare.so",
+            "containerPath": "/usr/lib/libSnpeHtpPrepare.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libSnpeHtpV75CalculatorStub.so",
+            "containerPath": "/usr/lib/libSnpeHtpV75CalculatorStub.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libSnpeHtpV75Stub.so",
+            "containerPath": "/usr/lib/libSnpeHtpV75Stub.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libhta_hexagon_runtime.so",
+            "containerPath": "/usr/lib/libhta_hexagon_runtime.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/libhta_hexagon_runtime_snpe.so",
+            "containerPath": "/usr/lib/libhta_hexagon_runtime_snpe.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/rfsa/adsp/hexagon-v75/libCalculator_skel.so",
+            "containerPath": "/usr/lib/rfsa/adsp/hexagon-v75/libCalculator_skel.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSaver.so",
+            "containerPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSaver.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSystem.so",
+            "containerPath": "/usr/lib/rfsa/adsp/hexagon-v75/libQnnSystem.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/rfsa/adsp/libQnnHtpV75.so",
+            "containerPath": "/usr/lib/rfsa/adsp/libQnnHtpV75.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/rfsa/adsp/libQnnHtpV75Skel.so",
+            "containerPath": "/usr/lib/rfsa/adsp/libQnnHtpV75Skel.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/rfsa/adsp/libSnpeHtpV75Skel.so",
+            "containerPath": "/usr/lib/rfsa/adsp/libSnpeHtpV75Skel.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libcdsprpc.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libcdsprpc.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libadsprpc.so",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libadsprpc.so",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/lib/aarch64-linux-gnu/libEGL_adreno.so.1.0.0",
+            "containerPath": "/usr/lib/aarch64-linux-gnu/libEGL_adreno.so.1.0.0",
+            "options": [
+              "bind"
+            ]
+          },
+          {
+            "hostPath": "/usr/share/glvnd/egl_vendor.d/10_adreno.json",
+            "containerPath": "/usr/share/glvnd/egl_vendor.d/10_adreno.json",
+            "options": [
+              "bind"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

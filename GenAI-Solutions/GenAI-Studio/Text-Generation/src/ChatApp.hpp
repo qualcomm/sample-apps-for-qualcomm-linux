@@ -4,50 +4,46 @@
 // ---------------------------------------------------------------------
 #pragma once
 
+#include <cstdint>
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 #include "Genie.hpp"
 
-namespace App
-{
-constexpr const std::string_view c_exit_prompt = "exit";
+namespace App {
 
-class ChatApp
-{
-  private:
-    std::string config_;
-    std::string m_user_name;
-    Genie genie_; 
-    
-    
+struct ModelSpec {
+    std::string name;        // bundle folder name
+    std::string config_path; // <bundle>/genie_config.json
+    std::string base_dir;    // <bundle>
+};
 
-  public:
-    /**
-     * ChatApp: Initializes ChatApp
-     *    - Uses provided Genie configuration string
-     *    - Creates handle for Genie
-     *
-     * @param config: JSON string containing Genie configuration
-     *
-     * @throws on failure to create handle for Genie config, dialog
-     *
-     */
-    ChatApp(const std::string& config);
-    ChatApp() = delete;
-    ChatApp(const ChatApp&) = delete;
-    ChatApp(ChatApp&&) = delete;
-    ChatApp& operator=(const ChatApp&) = delete;
-    ChatApp& operator=(ChatApp&&) = delete;
+class ChatApp {
+public:
+    explicit ChatApp(std::string bundle_dir, std::string initial_model_bundle = "");
     ~ChatApp();
 
-    /**
-     * ChatWithUser: Starts Chat with user using previously loaded config
-     *
-     * @param user_name: User name to use during chat
-     *
-     * @throws on failure to query model response during chat
-     *
-     */
-    void ChatLoop();
+    void Run(uint16_t port);
+
+private:
+    std::string m_bundle_dir;
+
+    // Registry of models discovered on disk (key: bundle name)
+    std::unordered_map<std::string, ModelSpec> m_models;
+
+    // Owning pointer to the currently active model instance
+    std::unique_ptr<Genie> m_active_genie_owner;
+    Genie* m_active_genie{nullptr};
+    std::string m_active_model_bundle;
+
+    // Backend-owned system prompt (can be set via /reload_model or /process)
+    std::string m_system_prompt{"You are a helpful assistant."};
+
+    static std::unordered_map<std::string, ModelSpec> DiscoverModels(const std::string& bundle_dir);
+    static std::string ChooseAlphabeticalFirstModel(const std::unordered_map<std::string, ModelSpec>& models);
+
+    bool LoadModel(const std::string& model_bundle, std::string& out_error);
 };
+
 } // namespace App

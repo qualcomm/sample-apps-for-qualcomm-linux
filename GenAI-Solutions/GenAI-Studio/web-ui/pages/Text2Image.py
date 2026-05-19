@@ -16,7 +16,7 @@ PAGE_KEY = "text2image"
 with st.sidebar:
     st.title('GenAI Studio')
     st.subheader('Solution')
-    st.markdown('More info [doc')
+    st.markdown('More info [doc](https://docs.qualcomm.com/bundle/publicresource/topics/80-70018-115/qualcomm-linux-docs-home.html?vproduct=1601111740013072&version=1.4)!')
     st.markdown('© Qualcomm Technologies, Inc.')
     st.markdown('---')
 

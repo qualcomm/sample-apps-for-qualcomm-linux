@@ -18,6 +18,8 @@ from transformers import CLIPTokenizer
 from diffusers import DPMSolverMultistepScheduler
 from diffusers.models.embeddings import get_timestep_embedding, TimestepEmbedding
 import argparse
+import requests, zipfile, io, shutil
+
 
 from qai_appbuilder import (QNNContext, Runtime, LogLevel, ProfilingLevel, PerfProfile, QNNConfig, timer)
 
@@ -28,12 +30,9 @@ app = Flask(__name__)
 ####################################################################
 
 MODEL_NAME                  = "stable_diffusion_v1_5"
-MODEL_ID_VAE                = "mmx0424em"
-MODEL_ID_UNET               = "mqvvdydeq"
-MODEL_ID_TEXT               = "mn4ke9yzm"
-TEXT_ENCODER_MODEL_NAME     = MODEL_NAME + "_w8a16_quantized-textencoderquantizable-qualcomm_snapdragon_x_elite.bin"
-UNET_MODEL_NAME             = MODEL_NAME + "_w8a16_quantized-unetquantizable-qualcomm_snapdragon_x_elite.bin"
-VAE_DECODER_MODEL_NAME      = MODEL_NAME + "_w8a16_quantized-vaedecoderquantizable-qualcomm_snapdragon_x_elite.bin"
+TEXT_ENCODER_MODEL_NAME     = "text_encoder.bin"
+UNET_MODEL_NAME             = "unet.bin"
+VAE_DECODER_MODEL_NAME      = "vae.bin"
 
 HUB_ID_H="ox06ibpbkxb4pr0mcyfe7wqgx5pf5r0cm3rf3dzi"
 
@@ -43,6 +42,7 @@ TOKENIZER_HELP_URL          = "https://github.com/quic/ai-engine-direct-helper/b
 MODEL_HELP_URL = "https://github.com/quic/ai-engine-direct-helper/tree/main/samples/python/" + MODEL_NAME + "#" + MODEL_NAME + "-qnn-models"
 
 ####################################################################
+dsp_arch = str(os.environ.get("DSP_ARCH", "v73"))  # defaults to 73 if not set
 
 execution_ws = os.getcwd()
 
@@ -94,10 +94,10 @@ class TextEncoder(QNNContext):
 class Unet(QNNContext):
     def Inference(self, input_data_1, input_data_2, input_data_3):
         # We need to reshape the array to 1 dimensionality before send it to the network. 'input_data_2' already is 1 dimensionality, so doesn't need to reshape.
-        input_data_1 = input_data_1.reshape(input_data_1.size)
+        latent = input_data_1.reshape(input_data_1.size)
         input_data_3 = input_data_3.reshape(input_data_3.size)
 
-        input_datas=[input_data_1, input_data_2, input_data_3]
+        input_datas=[input_data_2, latent, input_data_3]
         output_data = super().Inference(input_datas)[0]
 
         output_data = output_data.reshape(1, 64, 64, 4)
@@ -109,7 +109,7 @@ class VaeDecoder(QNNContext):
         input_datas=[input_data]
 
         output_data = super().Inference(input_datas)[0]
-        
+
         return output_data
 
 ####################################################################
@@ -142,13 +142,13 @@ def model_initialize():
         print(fail)
         exit()
 
-    # Instance for TextEncoder 
+    # Instance for TextEncoder
     text_encoder = TextEncoder(model_text_encoder, text_encoder_model_path)
 
-    # Instance for Unet 
+    # Instance for Unet
     unet = Unet(model_unet, unet_model_path)
 
-    # Instance for VaeDecoder 
+    # Instance for VaeDecoder
     vae_decoder = VaeDecoder(model_vae_decoder, vae_decoder_model_path)
 
     # Scheduler - initializing the Scheduler.
@@ -171,7 +171,7 @@ def setup_parameters(prompt, un_prompt, seed, step, text_guidance):
     user_seed = np.int64(seed)
     user_step = step
     user_text_guidance = text_guidance
-    
+
     if user_seed == -1:
         user_seed = np.random.randint(low=0, high=9999999999, size=None, dtype=np.int64)
 
@@ -260,7 +260,7 @@ def model_execute(callback, image_path, show_image = True):
         output_image = output_image.reshape(image_size, image_size, -1)
         output_image = Image.fromarray(output_image, mode="RGB")
         output_image.save(image_path)
-        
+
         if show_image:
             output_image.show()
 
@@ -300,27 +300,26 @@ def modelExecuteCallback(result):
         # print("modelExecuteCallback result: " + result)
 
 ####################################################################
-
 def model_download():
-    ret = True
+    if os.path.exists(text_encoder_model_path) and os.path.exists(unet_model_path) and os.path.exists(vae_decoder_model_path):
+        return
 
-    desc = f"Downloading {MODEL_NAME} model... "
-    fail = f"\nFailed to download {MODEL_NAME} model. Please prepare the models according to the steps in below link:\n{MODEL_HELP_URL}"
-
-    ret = install.download_qai_hubmodel(MODEL_ID_VAE, vae_decoder_model_path, desc=desc, fail=fail, hub_id=HUB_ID_H)
-    ret = install.download_qai_hubmodel(MODEL_ID_UNET, unet_model_path, desc=desc, fail=fail, hub_id=HUB_ID_H)
-    ret = install.download_qai_hubmodel(MODEL_ID_TEXT, text_encoder_model_path, desc=desc, fail=fail, hub_id=HUB_ID_H)
-
-    desc = "Please download Stable-Diffusion-v1.5 model from https://aihub.qualcomm.com/compute/models/stable_diffusion_v1_5 and save them to path 'samples\\python\\stable_diffusion_v1_5\\models'.\n"
-    if not os.path.exists(text_encoder_model_path) or not os.path.exists(unet_model_path) or not os.path.exists(vae_decoder_model_path):
-        print(desc)
-        exit()
+    if dsp_arch=="v75":
+        url = "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/stable_diffusion_v1_5/releases/v0.50.2/stable_diffusion_v1_5-qnn_context_binary-w8a16-qualcomm_sa7255p.zip"
+        sub_folder = sd_dir + "/stable_diffusion_v1_5-qnn_context_binary-w8a16-qualcomm_sa7255p"
+    else:
+        url = "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/stable_diffusion_v1_5/releases/v0.50.2/stable_diffusion_v1_5-qnn_context_binary-w8a16-qualcomm_snapdragon_x_elite.zip"
+        sub_folder = sd_dir + "/stable_diffusion_v1_5-qnn_context_binary-w8a16-qualcomm_snapdragon_x_elite"
+    print(f"Downloading {MODEL_NAME} model...")
+    r = requests.get(url)
+    with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+        z.extractall(sd_dir)
+    for f in os.listdir(sub_folder):
+        shutil.move(os.path.join(sub_folder, f), sd_dir)
+    shutil.rmtree(sub_folder)
+    print(f"{MODEL_NAME} models ready ✅")
 
 ####################################################################
-
-
-
-
 
 @app.route('/generate', methods=['POST'])
 def generate_image():
@@ -330,7 +329,7 @@ def generate_image():
     user_step = int(data.get("steps", 20))
     user_text_guidance = 7.5
     uncond_prompt = "lowres, text, error, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark"
-    
+
     setup_parameters(user_prompt, uncond_prompt, user_seed, user_step, user_text_guidance)
 
     # Call your existing model execution function
@@ -346,4 +345,3 @@ if __name__ == '__main__':
 
     app.run(host='0.0.0.0', port=8082)
     model_destroy()
-

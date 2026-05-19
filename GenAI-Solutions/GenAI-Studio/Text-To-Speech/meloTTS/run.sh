@@ -5,5 +5,5 @@
 
 #! /bin/bash
 . ~/miniconda3/bin/activate
-conda activate py310
+conda activate py311
 python3 meloTTS_app.py
