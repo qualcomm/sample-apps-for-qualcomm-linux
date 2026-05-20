@@ -83,8 +83,7 @@ Follow [connect-to-the-network](https://docs.qualcomm.com/doc/80-90441-252/topic
 > Add Qualcomm IoT PPA repository, which provides the necessary packages and updates
 ```
 sudo add-apt-repository ppa:ubuntu-qcom-iot/qcom-ppa
-```
-```
+
 sudo apt update
 ```
 
@@ -188,11 +187,20 @@ git clone https://github.com/quic/sample-apps-for-qualcomm-linux.git
 ```
 cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 ```
+##### NOTE: User can download the context binary from the Qualcomm AI Hub Page : https://aihub.qualcomm.com/models , for any Target Device
+
 ##### NOTE: Generating container image depends on network connection and can take more than 30 minutes each
 > Speech-To-Text
 ```
 cd Speech-To-Text
 docker  build --progress=plain -t asr .
+docker save -o asr asr
+cd ..
+```
+> Speech-To-Text // For Qualcomm IQ8
+```
+cd Speech-To-Text
+docker  build --progress=plain -t asr --build-arg GENAI_TARGET=IQ8 .
 docker save -o asr asr
 cd ..
 ```
@@ -211,7 +219,6 @@ docker save text2speech -o text2speech
 cd ..
 ```
 > Image-Generation
-
 ```
 cd Image-Generation
 docker  build --progress=plain -t text2image . 
@@ -238,6 +245,9 @@ Follow [Generate Models](#generate-models) for next steps
 ### QLI
   For Qualcomm IQ9
   > Download Pre-compiled  [QLI Image](https://artifacts.codelinaro.org/artifactory/qli-ci/flashable-binaries/qimpsdk/qcs9075-iq-9075-evk/x86-qcom-6.6.90-QLI.1.5-Ver.1.1_qim-product-sdk-image-2.0.1.zip) and Follow [Build Guide - Qualcomm® Linux Documentation](https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/flash_images.html?vproduct=1601111740013072&version=1.5) document to flash QLI image
+   For Qualcomm IQ8
+    > Download Pre-compiled model [binary files](https://aihub.qualcomm.com/models/whisper_base?searchTerm=whis) and Follow [Build Guide - Qualcomm® Linux Documentation](https://docs.qualcomm.com/bundle/publicresource/topics/80-70020-254/flash_images.html?vproduct=1601111740013072&version=1.5)
+
 ##### NOTE: On QLI, Qualcomm dependent DSP libraries and Docker are pre-installed
 
 #### On Host x86 machine
@@ -261,6 +271,13 @@ cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 ```
 cd Speech-To-Text
 docker  build --progress=plain --platform=linux/arm64/v8 -t asr .
+docker save -o asr asr
+cd ..
+```
+> Speech-To-Text // For Qualcomm IQ8
+```
+cd Speech-To-Text
+docker  build --progress=plain --platform=linux/arm64/v8 -t asr --build-arg GENAI_TARGET=IQ8 . 
 docker save -o asr asr
 cd ..
 ```
@@ -314,7 +331,7 @@ scp -r Speech-To-Text/asr Text-Generation/text2text Text-To-Speech/text2speech I
 #### On Target device
 ##### Load containers
 ```
-docker load -i /opt/asr
+docker load -i /opt/asr 
 docker load -i /opt/text2text
 docker load -i /opt/text2speech
 docker load -i /opt/text2image
@@ -354,7 +371,7 @@ scp -r genie_bundle root@<target-ip-address>:/opt/
 As TTS models are not distributed, Please install  https://qpm.qualcomm.com/#/main/tools/details/VoiceAI_TTS and follow "VoiceAI_TTS/1.0.1.0/notebook/melo/npu/README.md" to generate models
 
 **NOTE:** 
-* Use QAIRT 2.38 version
+* Use QAIRT 2.43 version
 * Use v73 dsp arch for IQ9
 > Add below commands in **Melo-Notebook.ipynb** Jupyter notebook to generate qnn_ctx onnx models
 ```
@@ -434,6 +451,7 @@ docker-compose -f docker-compose.yml down
 > Expected output
 
 ![stop_genai_studio](./assets/stop_genai_studio.png)
+
 
 
 

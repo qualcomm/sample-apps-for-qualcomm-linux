@@ -38,10 +38,10 @@ from qai_appbuilder import (QNNContext, Runtime, LogLevel, ProfilingLevel, PerfP
 app = Flask(__name__)
 
 MODEL_NAME="whisper_base_en"
-ENCODER_MODEL_ID = "mqvvjzzeq"
-DECODER_MODEL_ID = "mq8ylzzpm"
-ENCODER_MODEL_NAME = "whisper_base_en-whisperencoder-snapdragon_x_elite"
-DECODER_MODEL_NAME = "whisper_base_en-whisperdecoder-snapdragon_x_elite"
+#ENCODER_MODEL_ID = "mqvvjzzeq"
+#DECODER_MODEL_ID = "mq8ylzzpm"
+ENCODER_MODEL_NAME = "whisperencoder-snapdragon_x_elite"
+DECODER_MODEL_NAME = "whisperdecoder-snapdragon_x_elite"
 MODEL_HELP_URL = "https://github.com/quic/ai-engine-direct-helper/tree/main/samples/python/" + MODEL_NAME + "#" + MODEL_NAME + "-qnn-models"
 WHISPER_VERSION = "base.en"
 MEL_FILTER_PATH_URL = "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/whisper_asr_shared/v1/openai_assets/mel_filters.npz"
@@ -223,7 +223,7 @@ class WhisperBaseEn(Whisper):
         return super().from_pretrained(WHISPER_VERSION) 
 
 def model_download():
-    ret = True
+     ret = True
 
     if not os.path.exists(mel_filter_path):
         ret = install.download_url(MEL_FILTER_PATH_URL, mel_filter_path)
@@ -234,10 +234,7 @@ def model_download():
     if not os.path.exists(jfk_npz_path):
         ret = install.download_url(JFK_NPZ_PATH_URL, jfk_npz_path)
 
-    desc = f"Downloading {MODEL_NAME} model... "
-    fail = f"\nFailed to download {MODEL_NAME} model. Please prepare the model according to the steps in below link:\n{MODEL_HELP_URL}"
-    ret = install.download_qai_hubmodel(ENCODER_MODEL_ID, encoder_model_path, desc=desc, fail=fail)
-    ret = install.download_qai_hubmodel(DECODER_MODEL_ID, decoder_model_path, desc=desc, fail=fail)
+   print("[INFO] IQ9 model binaries are mounted via Docker, skipping download.")
 
     if not ret:
         exit()
