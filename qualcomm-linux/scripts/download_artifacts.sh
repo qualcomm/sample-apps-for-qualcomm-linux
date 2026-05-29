@@ -12,14 +12,17 @@ This script downloads and prepares required artifacts for your environment.
 
 Options:
   -h, --help        Display this help message and exit.
+  -f, --force       Force re-download of all files, even if they already exist.
 
 Examples:
   ./download_artifacts.sh                # Run the script with default settings
+  ./download_artifacts.sh --force        # Re-download all files, overwriting existing ones
   ./download_artifacts.sh --help         # Show detailed usage instructions
 
 Description:
   The script automates downloading models, configs, and related files from predefined URLs,
   unzips them, and organizes them into the appropriate directories for further processing.
+  By default, files that already exist on disk are skipped. Use --force to override this.
 EOF
 }
 
@@ -155,7 +158,8 @@ select_supported_qairt_version() {
 download_models() {
     local url=$1
     local output_dir=$2
-    if [ -f "$output_dir" ]; then
+    local force=${3:-false}
+    if [ "$force" != "true" ] && [ -f "$output_dir" ]; then
         echo "file already exists at $output_dir. Skipping download."
         return 0
     fi
@@ -170,6 +174,7 @@ download_models() {
 download_labels() {
     local url=$1
     local output_dir=$2
+    local force=${3:-false}
 
     local zip_name="$(basename "$url")"
     local tmp_zip="/tmp/$zip_name"
@@ -193,8 +198,8 @@ download_labels() {
 
     find "$content_dir" -type f | while read -r file; do
         local base_file="$(basename "$file")"
-        if [ ! -f "$output_dir/$base_file" ]; then
-            echo "Adding missing file: $base_file"
+        if [ "$force" = "true" ] || [ ! -f "$output_dir/$base_file" ]; then
+            echo "Copying file: $base_file"
             cp "$file" "$output_dir/"
         else
             echo "file already exists: ${output_dir}/$base_file. Skipping download."
@@ -210,7 +215,8 @@ download_labels() {
 download_file() {
     local url=$1
     local output_dir=$2
-    if [ -f "$output_dir" ]; then
+    local force=${3:-false}
+    if [ "$force" != "true" ] && [ -f "$output_dir" ]; then
         echo "file already exists at $output_dir. Skipping download."
         return 0
     fi
@@ -224,7 +230,8 @@ download_file() {
 download_from_zip() {
     local download_url="$1"
     local output_path="$2"
-    if [ -f "$output_path" ]; then
+    local force=${3:-false}
+    if [ "$force" != "true" ] && [ -f "$output_path" ]; then
         echo "file already exists at $output_path. Skipping download."
         return 0
     fi
@@ -250,7 +257,8 @@ download_from_zip() {
 download_config() {
     local url=$1
     local output_dir=$2
-    if [ -f "$output_dir" ]; then
+    local force=${3:-false}
+    if [ "$force" != "true" ] && [ -f "$output_dir" ]; then
         echo "file already exists at $output_dir. Skipping download."
         return 0
     fi
@@ -266,6 +274,7 @@ create_directory() {
 
 # Downloads the necessary TFLite and DLC models
 download_model_artifacts() {
+    local force=${1:-false}
     
     if awk "BEGIN {exit !($qairt_short_version < 2.39)}"; then
         output_path="/opt"
@@ -306,48 +315,48 @@ download_model_artifacts() {
         fi
 
         if [ "$ga_version" == "GA1.3-rel" ]; then
-            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.29_${chipset}.zip" ${output_model_path}   
+            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.29_${chipset}.zip" ${output_model_path} "$force"
         elif [ "$ga_version" == "GA1.4-rel" ]; then
-            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.32_${chipset}.zip" ${output_model_path}
+            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.32_${chipset}.zip" ${output_model_path} "$force"
         elif [ "$ga_version" == "GA1.5-rel" ]; then
-            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.35_${chipset}.zip" ${output_model_path}
+            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.35_${chipset}.zip" ${output_model_path} "$force"
         else
-            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.38_${chipset}.zip" ${output_model_path}
+            download_models "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/${ga_version}/v2.38_${chipset}.zip" ${output_model_path} "$force"
         fi
 
         if [ "$ga_version" == "GA1.4-rel" ] || [ "$ga_version" == "GA1.3-rel" ]; then
-            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/v0.29.1/Inception-v3_w8a8.tflite" "${output_model_path}/inception_v3_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/2751392b3ca5e6e8cd3316f4c62501aa17c268e8/DeepLabV3-Plus-MobileNet_w8a8.tflite" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/v0.29.1/Midas-V2_w8a8.tflite" "${output_model_path}/midas_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/HRNetPose/resolve/v0.29.1/HRNetPose_w8a8.tflite" "${output_model_path}/hrnet_pose_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/QuickSRNetSmall/resolve/977fb3092a065d512cd587c210cc1341b28b7161/QuickSRNetSmall_w8a8.tflite" "${output_model_path}/quicksrnetsmall_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Lightweight-Face-Detection/resolve/v0.30.3/Lightweight-Face-Detection_w8a8.tflite" "${output_model_path}/face_det_lite_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Facial-Landmark-Detection/resolve/v0.29.1/Facial-Landmark-Detection_w8a8.tflite" "${output_model_path}/facemap_3dmm_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/v0.29.1/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite"
+            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/v0.29.1/Inception-v3_w8a8.tflite" "${output_model_path}/inception_v3_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/2751392b3ca5e6e8cd3316f4c62501aa17c268e8/DeepLabV3-Plus-MobileNet_w8a8.tflite" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/v0.29.1/Midas-V2_w8a8.tflite" "${output_model_path}/midas_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/HRNetPose/resolve/v0.29.1/HRNetPose_w8a8.tflite" "${output_model_path}/hrnet_pose_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/QuickSRNetSmall/resolve/977fb3092a065d512cd587c210cc1341b28b7161/QuickSRNetSmall_w8a8.tflite" "${output_model_path}/quicksrnetsmall_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Lightweight-Face-Detection/resolve/v0.30.3/Lightweight-Face-Detection_w8a8.tflite" "${output_model_path}/face_det_lite_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Facial-Landmark-Detection/resolve/v0.29.1/Facial-Landmark-Detection_w8a8.tflite" "${output_model_path}/facemap_3dmm_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/v0.29.1/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite" "$force"
         fi
 
         if [ "$ga_version" == "GA1.5-rel" ] || [ "$ga_version" == "GA1.6-rel" ]; then
-            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/ba8121b0a74c7e28b45b250064c26efc7e7da29e/Inception-v3_w8a8.tflite" "${output_model_path}/inception_v3_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/2751392b3ca5e6e8cd3316f4c62501aa17c268e8/DeepLabV3-Plus-MobileNet_w8a8.tflite" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/d182b62632d80d3d1690f6e13fec18dd09c05fdf/Midas-V2_w8a8.tflite" "${output_model_path}/midas_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/HRNetPose/resolve/dbfe1866bd2dbfb9eecb32e54b8fcdc23d77098b/HRNetPose_w8a8.tflite" "${output_model_path}/hrnet_pose_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/QuickSRNetSmall/resolve/977fb3092a065d512cd587c210cc1341b28b7161/QuickSRNetSmall_w8a8.tflite" "${output_model_path}/quicksrnetsmall_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Lightweight-Face-Detection/resolve/e80b4d954ffaaefe2958e70b27bee77e74cc8550/Lightweight-Face-Detection_w8a8.tflite" "${output_model_path}/face_det_lite_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Facial-Landmark-Detection/resolve/2353f012b24fd407902e38d0c5fdd591cd2b1380/Facial-Landmark-Detection_w8a8.tflite" "${output_model_path}/facemap_3dmm_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/228624993581944d488f232ae50174795d489661/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite"
-            download_file "https://huggingface.co/qualcomm/Yolo-X/resolve/v0.30.5/Yolo-X_w8a8.tflite" "${output_model_path}/yolox_quantized.tflite"
+            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/ba8121b0a74c7e28b45b250064c26efc7e7da29e/Inception-v3_w8a8.tflite" "${output_model_path}/inception_v3_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/2751392b3ca5e6e8cd3316f4c62501aa17c268e8/DeepLabV3-Plus-MobileNet_w8a8.tflite" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/d182b62632d80d3d1690f6e13fec18dd09c05fdf/Midas-V2_w8a8.tflite" "${output_model_path}/midas_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/HRNetPose/resolve/dbfe1866bd2dbfb9eecb32e54b8fcdc23d77098b/HRNetPose_w8a8.tflite" "${output_model_path}/hrnet_pose_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/QuickSRNetSmall/resolve/977fb3092a065d512cd587c210cc1341b28b7161/QuickSRNetSmall_w8a8.tflite" "${output_model_path}/quicksrnetsmall_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Lightweight-Face-Detection/resolve/e80b4d954ffaaefe2958e70b27bee77e74cc8550/Lightweight-Face-Detection_w8a8.tflite" "${output_model_path}/face_det_lite_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Facial-Landmark-Detection/resolve/2353f012b24fd407902e38d0c5fdd591cd2b1380/Facial-Landmark-Detection_w8a8.tflite" "${output_model_path}/facemap_3dmm_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/228624993581944d488f232ae50174795d489661/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Yolo-X/resolve/v0.30.5/Yolo-X_w8a8.tflite" "${output_model_path}/yolox_quantized.tflite" "$force"
         fi
 
         if [ "$ga_version" == "GA1.3-rel" ]; then
             # Download config files
-            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-classification/config_classification.json?inline=false" "${output_config_path}/config_classification.json"
-            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-daisychain-detection-classification/config_daisychain_detection_classification.json" "${output_config_path}/config_daisychain_detection_classification.json"
-            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-monodepth/config_monodepth.json" "${output_config_path}/config_monodepth.json"
-            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-ai-object-detection/config_detection.json?inline=false" "${output_config_path}/config_detection.json"
-            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-ai-pose-detection/config_pose.json?inline=false" "${output_config_path}/config_pose.json"
-            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-segmentation/config_segmentation.json?inline=false" "${output_config_path}/config_segmentation.json"
+            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-classification/config_classification.json?inline=false" "${output_config_path}/config_classification.json" "$force"
+            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-daisychain-detection-classification/config_daisychain_detection_classification.json" "${output_config_path}/config_daisychain_detection_classification.json" "$force"
+            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-monodepth/config_monodepth.json" "${output_config_path}/config_monodepth.json" "$force"
+            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-ai-object-detection/config_detection.json?inline=false" "${output_config_path}/config_detection.json" "$force"
+            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-ai-pose-detection/config_pose.json?inline=false" "${output_config_path}/config_pose.json" "$force"
+            download_config "https://git.codelinaro.org/clo/le/platform/vendor/qcom-opensource/gst-plugins-qti-oss/-/raw/4cb0d59ade7b996db4fc5e8f9af3a963ce7d767e/gst-sample-apps/gst-ai-segmentation/config_segmentation.json?inline=false" "${output_config_path}/config_segmentation.json" "$force"
         fi
 
     else
@@ -373,43 +382,43 @@ download_model_artifacts() {
         #tflite models
         if awk "BEGIN {exit !($qairt_short_version < 2.43)}"; then
 
-            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/${model_version}/Inception-v3_w8a8.tflite" "${output_model_path}/inception_v3_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/${model_version}/DeepLabV3-Plus-MobileNet_w8a8.tflite" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/${model_version}/Midas-V2_w8a8.tflite" "${output_model_path}/midas_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/HRNetPose/resolve/${model_version}/HRNetPose_w8a8.tflite" "${output_model_path}/hrnet_pose_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/QuickSRNetSmall/resolve/${model_version}/QuickSRNetSmall_w8a8.tflite" "${output_model_path}/quicksrnetsmall_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Lightweight-Face-Detection/resolve/${model_version}/Lightweight-Face-Detection_w8a8.tflite" "${output_model_path}/face_det_lite_quantized.tflite"
-            download_file "https://huggingface.co/qualcomm/Facial-Landmark-Detection/resolve/${model_version}/Facial-Landmark-Detection_w8a8.tflite" "${output_model_path}/facemap_3dmm_quantized.tflite"
+            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/${model_version}/Inception-v3_w8a8.tflite" "${output_model_path}/inception_v3_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/${model_version}/DeepLabV3-Plus-MobileNet_w8a8.tflite" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/${model_version}/Midas-V2_w8a8.tflite" "${output_model_path}/midas_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/HRNetPose/resolve/${model_version}/HRNetPose_w8a8.tflite" "${output_model_path}/hrnet_pose_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/QuickSRNetSmall/resolve/${model_version}/QuickSRNetSmall_w8a8.tflite" "${output_model_path}/quicksrnetsmall_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Lightweight-Face-Detection/resolve/${model_version}/Lightweight-Face-Detection_w8a8.tflite" "${output_model_path}/face_det_lite_quantized.tflite" "$force"
+            download_file "https://huggingface.co/qualcomm/Facial-Landmark-Detection/resolve/${model_version}/Facial-Landmark-Detection_w8a8.tflite" "${output_model_path}/facemap_3dmm_quantized.tflite" "$force"
 
         else
 
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/inception_v3/releases/${model_version}/inception_v3-tflite-w8a8.zip" "${output_model_path}/inception_v3_quantized.tflite"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/deeplabv3_plus_mobilenet/releases/${model_version}/deeplabv3_plus_mobilenet-tflite-w8a8.zip" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/midas/releases/${model_version}/midas-tflite-w8a8.zip" "${output_model_path}/midas_quantized.tflite"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/hrnet_pose/releases/${model_version}/hrnet_pose-tflite-w8a8.zip" "${output_model_path}/hrnet_pose_quantized.tflite"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/quicksrnetsmall/releases/${model_version}/quicksrnetsmall-tflite-w8a8.zip" "${output_model_path}/quicksrnetsmall_quantized.tflite"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/face_det_lite/releases/${model_version}/face_det_lite-tflite-w8a8.zip" "${output_model_path}/face_det_lite_quantized.tflite"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/facemap_3dmm/releases/${model_version}/facemap_3dmm-tflite-w8a8.zip" "${output_model_path}/facemap_3dmm_quantized.tflite"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/inception_v3/releases/${model_version}/inception_v3-tflite-w8a8.zip" "${output_model_path}/inception_v3_quantized.tflite" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/deeplabv3_plus_mobilenet/releases/${model_version}/deeplabv3_plus_mobilenet-tflite-w8a8.zip" "${output_model_path}/deeplabv3_plus_mobilenet_quantized.tflite" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/midas/releases/${model_version}/midas-tflite-w8a8.zip" "${output_model_path}/midas_quantized.tflite" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/hrnet_pose/releases/${model_version}/hrnet_pose-tflite-w8a8.zip" "${output_model_path}/hrnet_pose_quantized.tflite" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/quicksrnetsmall/releases/${model_version}/quicksrnetsmall-tflite-w8a8.zip" "${output_model_path}/quicksrnetsmall_quantized.tflite" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/face_det_lite/releases/${model_version}/face_det_lite-tflite-w8a8.zip" "${output_model_path}/face_det_lite_quantized.tflite" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/facemap_3dmm/releases/${model_version}/facemap_3dmm-tflite-w8a8.zip" "${output_model_path}/facemap_3dmm_quantized.tflite" "$force"
 
         fi
 
         #hardcoded tflite models
-        download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/228624993581944d488f232ae50174795d489661/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite"
-        download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite"
-        download_file "https://huggingface.co/qualcomm/Yolo-X/resolve/v0.30.5/Yolo-X_w8a8.tflite" "${output_model_path}/yolox_quantized.tflite"
+        download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/228624993581944d488f232ae50174795d489661/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite" "$force"
+        download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite" "$force"
+        download_file "https://huggingface.co/qualcomm/Yolo-X/resolve/v0.30.5/Yolo-X_w8a8.tflite" "${output_model_path}/yolox_quantized.tflite" "$force"
 
         #dlc models
         if awk "BEGIN {exit !($qairt_short_version < 2.43)}"; then
 
-            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/${model_version}/Inception-v3_w8a8.dlc" "${output_model_path}/inceptionv3.dlc"
-            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/${model_version}/DeepLabV3-Plus-MobileNet_w8a8.dlc" "${output_model_path}/deeplabv3_plus_mobilenet.dlc"
-            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/${model_version}/Midas-V2_w8a8.dlc" "${output_model_path}/midasv2.dlc"
+            download_file "https://huggingface.co/qualcomm/Inception-v3/resolve/${model_version}/Inception-v3_w8a8.dlc" "${output_model_path}/inceptionv3.dlc" "$force"
+            download_file "https://huggingface.co/qualcomm/DeepLabV3-Plus-MobileNet/resolve/${model_version}/DeepLabV3-Plus-MobileNet_w8a8.dlc" "${output_model_path}/deeplabv3_plus_mobilenet.dlc" "$force"
+            download_file "https://huggingface.co/qualcomm/Midas-V2/resolve/${model_version}/Midas-V2_w8a8.dlc" "${output_model_path}/midasv2.dlc" "$force"
         
         else
 
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/inception_v3/releases/${model_version}/inception_v3-qnn_dlc-w8a8.zip" "${output_model_path}/inceptionv3.dlc"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/deeplabv3_plus_mobilenet/releases/${model_version}/deeplabv3_plus_mobilenet-qnn_dlc-w8a8.zip" "${output_model_path}/deeplabv3_plus_mobilenet.dlc"
-            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/midas/releases/${model_version}/midas-qnn_dlc-w8a8.zip" "${output_model_path}/midasv2.dlc"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/inception_v3/releases/${model_version}/inception_v3-qnn_dlc-w8a8.zip" "${output_model_path}/inceptionv3.dlc" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/deeplabv3_plus_mobilenet/releases/${model_version}/deeplabv3_plus_mobilenet-qnn_dlc-w8a8.zip" "${output_model_path}/deeplabv3_plus_mobilenet.dlc" "$force"
+            download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/midas/releases/${model_version}/midas-qnn_dlc-w8a8.zip" "${output_model_path}/midasv2.dlc" "$force"
 
         fi
     fi
@@ -434,14 +443,20 @@ extract_chipset() {
 
 
 main() {
+    local force=false
 
     while [[ "$#" -gt 0 ]]; do
         case $1 in
             -h|--help) show_help; exit 0 ;;
+            -f|--force) force=true ;;
             *) echo "Unknown parameter passed: $1"; show_help; exit 1 ;;
         esac
         shift
     done
+
+    if [ "$force" = "true" ]; then
+        echo "Force mode enabled: existing files will be overwritten."
+    fi
 
 
     #check_internet
@@ -459,27 +474,27 @@ main() {
 
     extract_chipset
 
-    download_model_artifacts
+    download_model_artifacts "$force"
 
     if [ "$build_type" = "Ubuntu" ]; then
         sudo apt install unzip
         chown -R ubuntu:ubuntu /etc/media/ /etc/labels/ /etc/models/ /etc/data/
-        download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/qdemo/Qdemo.gif" "${output_media_path}/Qdemo.gif"
-        download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/qdemo/Qdemo.png" "${output_media_path}/Qdemo.png"
+        download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/qdemo/Qdemo.gif" "${output_media_path}/Qdemo.gif" "$force"
+        download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/qdemo/Qdemo.png" "${output_media_path}/Qdemo.png" "$force"
     fi
 
     # Download the label files with both .labels and .json extensions
-    download_labels "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/labels/labels.zip" ${output_label_path}
-    # download_labels "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/GA1.6-labels/labels.zip" ${output_label_path}
+    download_labels "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/labels/labels.zip" ${output_label_path} "$force"
+    # download_labels "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/GA1.6-labels/labels.zip" ${output_label_path} "$force"
 
     # Download the necessary artifacts for the face recognition application
-    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/data/blendShape.bin" "${output_data_path}/blendShape.bin"
-    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/data/meanFace.bin" "${output_data_path}/meanFace.bin"
-    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/data/shapeBasis.bin" "${output_data_path}/shapeBasis.bin"
-    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video.mp4" "${output_media_path}/video.mp4"
-    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video1.mp4" "${output_media_path}/video1.mp4"
-    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video-flac.mp4" "${output_media_path}/video-flac.mp4"
-    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video-mp3.mp4" "${output_media_path}/video-mp3.mp4"
+    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/data/blendShape.bin" "${output_data_path}/blendShape.bin" "$force"
+    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/data/meanFace.bin" "${output_data_path}/meanFace.bin" "$force"
+    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/data/shapeBasis.bin" "${output_data_path}/shapeBasis.bin" "$force"
+    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video.mp4" "${output_media_path}/video.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video1.mp4" "${output_media_path}/video1.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video-flac.mp4" "${output_media_path}/video-flac.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/quic/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/videos/video-mp3.mp4" "${output_media_path}/video-mp3.mp4" "$force"
 
 
     # Creates copies of the video1.mp4 file 
