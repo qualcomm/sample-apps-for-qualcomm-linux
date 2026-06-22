@@ -113,6 +113,7 @@ declare -A qairt_map=(
     ["2.40.0.251030"]="v0.42.0"
     ["2.41.0.251128"]="v0.44.0"
     ["2.43.0.260127"]="v0.48.0"
+    ["2.45.0.260326"]="v0.56.0"
 )
 
 # Checks if the QAIRT version is lesser than or equal to the device QAIRT version
