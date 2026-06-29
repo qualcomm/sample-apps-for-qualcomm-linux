@@ -1,0 +1,17 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "framerate": 30,
+  "output":"waylandsink",
+  "video-format":"yuy2",
+  "model":"/etc/models/yolox_quantized.tflite",
+  "labels":"/etc/labels/yolox.json",
+  "output-file":"/etc/media/output.mp4",
+  "ip-address":"127.0.0.1",
+  "port":"8900",
+  "enable-object-detection": "TRUE",
+  "ml-framework": "tflite",
+  "yolo-model-type": "yolox",
+  "threshold": 75,
+  "runtime": "cpu"
+}
