@@ -1,0 +1,7 @@
+{
+  "file-path": "/etc/media/video.mp4",
+  "model": "/etc/models/yolox_quantized.tflite",
+  "labels": "/etc/labels/yolox.json",
+  "threshold": 40,
+  "runtime": "cpu"
+}

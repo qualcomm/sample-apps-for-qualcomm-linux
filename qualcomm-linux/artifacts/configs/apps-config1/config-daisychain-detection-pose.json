@@ -1,0 +1,10 @@
+{
+    "input-file": "/etc/media/video.mp4",
+    "pose-runtime":"cpu",
+    "detection-runtime":"cpu",
+    "detection-model": "/etc/models/yolox_quantized.tflite",
+    "detection-labels": "/etc/labels/yolox.json",
+    "pose-model": "/etc/models/hrnet_pose_quantized.tflite",
+    "pose-labels": "/etc/labels/hrnet_pose.json",
+    "pose-settings-path":"/etc/labels/hrnet_settings.json"
+}

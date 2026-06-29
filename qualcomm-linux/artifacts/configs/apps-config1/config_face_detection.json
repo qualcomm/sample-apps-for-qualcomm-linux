@@ -1,0 +1,8 @@
+{
+  "file-path": "/etc/media/video.mp4",
+  "ml-framework": "tflite",
+  "model": "/etc/models/face_det_lite_quantized.tflite",
+  "labels": "/etc/labels/face_detection.json",
+  "threshold": 51,
+  "runtime": "cpu"
+}
