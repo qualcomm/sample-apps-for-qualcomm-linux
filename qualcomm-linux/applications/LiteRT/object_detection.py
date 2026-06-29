@@ -26,13 +26,13 @@ VIDEO_IN = "/etc/media/video.mp4"
 VIDEO_OUT = "output_object_detection.mp4"
 DELEGATE_PATH = "libQnnTFLiteDelegate.so"
 
-FRAME_W, FRAME_H = 1600, 900
+FRAME_W, FRAME_H = 1080, 720
 FPS_OUT = 30
 CONF_THRES = 0.60
 NMS_IOU_THRES = 0.50
-BOX_SCALE = 3.2108588218688965
-BOX_ZP = 31.0
-SCORE_SCALE = 0.0038042240776121616
+BOX_SCALE = 3.6124823093414307
+BOX_ZP = 38.0
+SCORE_SCALE = 0.003626860911026597
 
 # -------------------- Load Model --------------------
 delegate_options = {'backend_type': 'htp'}
@@ -58,7 +58,7 @@ if args.output == "file":
 else:
     Gst.init(None)
     pipeline = Gst.parse_launch(
-        'appsrc name=src is-live=true block=true format=time caps=video/x-raw,format=BGR,width=1600,height=900,framerate=30/1 ! videoconvert ! waylandsink'
+        'appsrc name=src is-live=true block=true format=time caps=video/x-raw,format=BGR,width=1080,height=720,framerate=30/1 ! videoconvert ! waylandsink sync=false'
     )
     appsrc = pipeline.get_by_name('src')
     pipeline.set_state(Gst.State.PLAYING)
