@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-multistream-batch-inference",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -31,6 +31,24 @@
     "MultistreamInference",
     "BatchInference",
     "MultistreamBatchInference"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-multistream-batch-inference.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-multistream-batch-inference/config-multistream-batch-inference.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application demonstrates batched object detection/image segmentation on upto 24 input files streams"
 }

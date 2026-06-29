@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-face-detection",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -22,6 +22,29 @@
   "MediaLocation": "/etc/media/",
   "ApplicationKeyWords": [
     "FaceDetection"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config_face_detection.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config_face_detection.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config_face_detection.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-face-detection/config_face_detection.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application is designed to enables you to infer depth of a source feed from a live camera stream, file, or an RTSP stream."
 }

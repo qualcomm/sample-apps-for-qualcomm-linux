@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-segmentation",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -43,6 +43,29 @@
     "SemanticSegmentation.",
     "DeeplabV3",
     "FFNet"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config_segmentation.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config_segmentation.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config_segmentation.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-segmentation/config_segmentation.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application enables you to divide an image into different and meaningful parts or segments and assign a label to each homogenous segment based on the similarity of the attributes."
 }

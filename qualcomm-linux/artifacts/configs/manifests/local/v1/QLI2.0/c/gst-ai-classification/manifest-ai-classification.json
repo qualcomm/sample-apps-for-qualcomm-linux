@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-classification",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -73,6 +73,30 @@
     "Classification",
     "InceptionV3",
     "Imagenet"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config_classification.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config_classification.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config_classification.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-classification/config_classification.json"
+    }
+  ],
+  "OverlaySupport": [ {
+      "overlayIds": [
+        "CamX",
+        "libCamera"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream",
+        "upstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application is designed to identify the subject in an image. The use cases use the Qualcomm Neural Processing SDK, LiteRT, or Qualcomm AI Engine direct models."
 }

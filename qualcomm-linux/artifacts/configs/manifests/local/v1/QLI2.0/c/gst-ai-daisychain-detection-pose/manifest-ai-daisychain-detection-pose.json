@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-daisychain-detection-pose",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -32,6 +32,29 @@
   "ApplicationKeyWords": [
     "DaisychainDetectionPose",
     "DaisychainDetection"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-daisychain-detection-pose.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-daisychain-detection-pose.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-daisychain-detection-pose.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-daisychain-detection-pose/config-daisychain-detection-pose.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application demonstrates Daisychain of object detection and pose detection for input coming from camera/file/rtsp"
 }

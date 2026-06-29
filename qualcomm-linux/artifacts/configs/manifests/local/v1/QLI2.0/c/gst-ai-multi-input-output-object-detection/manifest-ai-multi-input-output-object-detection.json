@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-multi-input-output-object-detection",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -23,6 +23,24 @@
   "ApplicationKeyWords": [
     "MultiInputOuputObjectDetection",
     "MultiInputOutputInferencing"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-multi-input-output-object-detection.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-multi-input-output-object-detection/config-multi-input-output-object-detection.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application demonstrates object detection over multiple input/output stream combinations. Input streams can come from camera/file/rtsp and output can be display or file or rtsp"
 }

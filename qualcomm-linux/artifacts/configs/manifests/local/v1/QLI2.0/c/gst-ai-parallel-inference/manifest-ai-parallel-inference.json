@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-parallel-inference",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -44,6 +44,24 @@
   "ApplicationKeyWords": [
     "ParallelInference.",
     "ParallelAIFusion"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-parallel-inference.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-parallel-inference/config-parallel-inference.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application enables you to perform object detection, object classification, pose detection, and image segmentation on an input stream"
 }

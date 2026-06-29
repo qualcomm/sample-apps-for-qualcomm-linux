@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-usb-camera-detection",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -20,6 +20,29 @@
   "ApplicationKeyWords": [
     "ObjectDetection",
     "Detection"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-usb-camera-app.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-usb-camera-app.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-usb-camera-app.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-usb-camera-app/config-usb-camera-app.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application is designed to enables you to detect objects within images and videos. The use cases show the execution of YOLOv5, YOLOv8, and YOLO-NAS on Qualcomm AI HW accelerator"
 }

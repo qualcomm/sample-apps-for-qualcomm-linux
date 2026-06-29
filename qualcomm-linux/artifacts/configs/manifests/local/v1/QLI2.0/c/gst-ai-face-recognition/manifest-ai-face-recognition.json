@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-face-recognition",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -51,6 +51,24 @@
   "ConfigFileLocation": "/etc/configs/",
   "ApplicationKeyWords": [
     "Face Recognition"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-face-recognition.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-face-recognition/config-face-recognition.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "The gst-ai-face-recognition application collects the live video input from a camera or an RTSP stream and shares this input for face detection and recognition."
 }

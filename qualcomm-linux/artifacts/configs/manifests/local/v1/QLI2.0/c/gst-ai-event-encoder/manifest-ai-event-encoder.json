@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-event-encoder",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -23,6 +23,29 @@
   "ApplicationKeyWords": [
     "EventEncoder",
     "EventEncoderExample"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-event-encoder.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-event-encoder.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-event-encoder.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-event-encoder/config-event-encoder.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application demonstrates video encoding when there is a person in the frame, otherwise only preview will run on the input video coming from camera, file or rtsp stream"
 }

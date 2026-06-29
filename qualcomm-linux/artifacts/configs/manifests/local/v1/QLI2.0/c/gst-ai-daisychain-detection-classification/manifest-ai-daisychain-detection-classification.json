@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-daisychain-detection-classification",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -84,6 +84,29 @@
   "ApplicationKeyWords": [
     "DaisychainDetectionClassification",
     "DaisychainDetection"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config_daisychain_detection_classification.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config_daisychain_detection_classification.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config_daisychain_detection_classification.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-daisychain-detection-classification/config_daisychain_detection_classification.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application demonstrates Daisychain of object detection and object classification for input coming from camera/file/rtsp"
 }

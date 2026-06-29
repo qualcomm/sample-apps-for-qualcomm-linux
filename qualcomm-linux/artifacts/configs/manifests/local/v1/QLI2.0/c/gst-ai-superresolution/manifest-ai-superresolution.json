@@ -42,5 +42,23 @@
   "ApplicationKeyWords": [
     "Superresolution"
   ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-superresolution.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-superresolution/config-superresolution.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
+  ],
   "ApplicationTextDescription": "This application demonstrates video super resolution on input file stream, and outputs the result as file or as display preview"
 }

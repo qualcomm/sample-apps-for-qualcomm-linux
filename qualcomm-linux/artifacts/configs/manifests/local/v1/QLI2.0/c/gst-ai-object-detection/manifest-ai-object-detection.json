@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-object-detection",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -23,6 +23,30 @@
   "ApplicationKeyWords": [
     "ObjectDetection",
     "Detection"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config_detection.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config_detection.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config_detection.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-object-detection/config_detection.json"
+    }
+  ],
+  "OverlaySupport": [ {
+      "overlayIds": [
+        "CamX",
+        "libCamera"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream",
+        "upstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application is designed to enables you to detect objects within images and videos. The use cases show the execution of YOLOv5, YOLOv8, and YOLO-NAS on Qualcomm AI HW accelerator"
 }

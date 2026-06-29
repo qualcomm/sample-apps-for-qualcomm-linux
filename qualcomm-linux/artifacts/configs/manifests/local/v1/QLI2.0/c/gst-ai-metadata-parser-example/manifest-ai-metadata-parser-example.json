@@ -1,5 +1,5 @@
 {
-  "Version": "1.8",
+  "Version": "2.0",
   "ApplicationName": "gst-ai-metadata-parser-example",
   "ApplicationType": "AI",
   "ApplicationSourceCheckSum": "",
@@ -23,6 +23,29 @@
   "ApplicationKeyWords": [
     "MetadataParser",
     "MetadataParserExample"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-metadata-parser.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-metadata-parser.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-metadata-parser.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-metadata-parser-example/config-metadata-parser.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
   ],
   "ApplicationTextDescription": "This application demonstrates parsing of metadata obtained from result of Object Detection to obtain people count in input coming from camera, file or rtsp stream"
 }
