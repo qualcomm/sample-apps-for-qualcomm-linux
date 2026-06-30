@@ -212,7 +212,7 @@ bash scripts/validate-stack.sh --skip-start
 ### 1) Text-To-Text
 
 **Pain points:**
-- None observed in recent audits.
+- Running on QLI 2.0 can sometimes lead to the error `14001` in docker logs. Remove the HOST RPC LIB path from the docker-compose.yml file.
 
 **Hardening ideas:**
 - Keep functional smoke test in CI (`/v1/chat/completions`) after each target rebuild.
