@@ -184,6 +184,8 @@ Do not bulk-copy `hexagon-v73/unsigned/*.so*` into flat dir (can cause ASR ELF c
 
 ## 7) Verify Host RPC/DSP Paths
 
+For ubuntu and QLI 1.x
+
 ```bash
 unset HOST_RPC_LIB_DIR
 for d in /usr/lib/aarch64-linux-gnu /usr/lib; do
@@ -200,10 +202,10 @@ ls -ld /usr/lib/dsp /usr/lib/dsp/cdsp 2>/dev/null || true
 ls -l /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 2>/dev/null || true
 ```
 
-Optional compatibility alias for older loaders:
+For QLI 2.0 run:
 
 ```bash
-sudo ln -sfn /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 /usr/lib/dsp/fastrpc_shell_unsigned_3
+ln -sfn /usr/share/qcom/sa8775/Qualcomm/IQ-9075/cdsp/fastrpc_shell_unsigned_3 /usr/lib/dsp/fastrpc_shell_unsigned_3
 ```
 
 ## 8) Final Readiness
