@@ -72,9 +72,7 @@ RUN mkdir -p ./core-services/text-to-image/src/httplib ./core-services/text-to-i
     cp /opt/headers/httplib/httplib.h ./core-services/text-to-image/src/crow.h && \
     cp /opt/headers/httplib/httplib.h ./core-services/text-to-image/src/crow/crow.h && \
     cp /opt/headers/nlohmann/json.hpp ./core-services/text-to-image/src/json.hpp && \
-    wget -q --tries=3 --timeout=30 \
-      https://raw.githubusercontent.com/nothings/stb/master/stb_image_write.h \
-      -O ./core-services/text-to-image/src/stb_image_write.h
+    cp /opt/headers/stb/stb_image_write.h ./core-services/text-to-image/src/stb_image_write.h
 
 RUN rm -rf ./core-services/text-to-image/build && \
     cmake -S ./core-services/text-to-image/src -B ./core-services/text-to-image/build \

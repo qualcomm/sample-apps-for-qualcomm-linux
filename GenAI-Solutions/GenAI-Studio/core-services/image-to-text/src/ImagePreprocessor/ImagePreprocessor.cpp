@@ -1,4 +1,7 @@
 // =============================================================================
+// Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+// SPDX-License-Identifier: BSD-3-Clause
+// =============================================================================
 // ImagePreprocessor.cpp
 // =============================================================================
 // STB image is a single-header library. We define the implementation here

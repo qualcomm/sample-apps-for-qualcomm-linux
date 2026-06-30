@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # ---------------------------------------------------------------------
+# Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+# ---------------------------------------------------------------------
 # Shared configuration and HTTP/OpenAI clients for orchestrator routes.
 # ---------------------------------------------------------------------
 

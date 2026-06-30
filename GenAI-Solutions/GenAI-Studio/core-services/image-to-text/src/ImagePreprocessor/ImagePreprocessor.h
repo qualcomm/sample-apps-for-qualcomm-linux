@@ -1,4 +1,7 @@
 // =============================================================================
+// Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+// SPDX-License-Identifier: BSD-3-Clause
+// =============================================================================
 // ImagePreprocessor.h
 // Converts JPEG/PNG/BMP images to pixel_values.raw for Qwen2.5-VL
 //

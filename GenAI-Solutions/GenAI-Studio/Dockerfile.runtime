@@ -20,22 +20,55 @@
 #
 # ─── What's included ─────────────────────────────────────────────────────────
 #   - Ubuntu 24.04 ARM64 base (libc, libstdc++, libgcc_s, libm)
-#   - qcom-fastrpc1          : FastRPC runtime (DSP communication)
-#   - qcom-libdmabufheap     : DMA buffer heap runtime
+#   - libcdsprpc.so (source-built) : FastRPC runtime (DSP communication, kernel-ABI compatible)
+#   - qcom-libdmabufheap     : DMA buffer heap runtime (self-contained, no host reliance)
 #   - firmware-qcom-hlosfw   : Qualcomm firmware files
 #   - libatomic1             : atomic operations runtime
+#   - /usr/lib/rfsa/adsp/    : Hexagon DSP unsigned .so staging directory
+#   - /etc/fastrpc/hexagon-dsp-binaries.yaml : multi-device DSP path config
 #
 # ─── What's NOT included (build-time only) ───────────────────────────────────
 #   - cmake, make, gcc, g++, binutils, cpp
 #   - qcom-fastrpc-dev, qcom-dspservices-headers-dev (headers)
 #   - linux-libc-dev, libstdc++-dev (headers)
 #   - software-properties-common, wget
+#
+# ─── Host OS compatibility ───────────────────────────────────────────────────
+#   Self-contained — works on both QLinux (Debian OSTree) and Ubuntu hosts.
+#   Does NOT rely on host bind-mounted libs (host libdmabufheap may be broken
+#   on OSTree-based QLinux devices). Container brings its own clean copy.
+#   FastRPC is built from source (v1.0.5) for kernel-ABI compatibility.
 
+# ─── FastRPC Builder stage ───────────────────────────────────────────────
+FROM ubuntu:24.04 AS fastrpc-builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git make gcc autoconf automake libtool pkg-config \
+        libyaml-dev \
+        libbsd-dev \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Build FastRPC with machine-name lookup enabled
+RUN cd /tmp && \
+    git clone --depth 1 https://github.com/quic/fastrpc.git --branch v1.0.5 && \
+    cd fastrpc && \
+    autoreconf -is && \
+    CFLAGS='-UMACHINE_NAME_PATH -DMACHINE_NAME_PATH=\"/run/device-model\"' \
+    ./configure --prefix=/usr --libdir=/usr/lib/aarch64-linux-gnu && \
+    make -j"$(nproc)" && \
+    make DESTDIR=/tmp/fastrpc-install install
+
+
+# ─── Runtime stage ───────────────────────────────────────────────────────
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install only runtime libs (no build tools, no dev headers)
+# ─── Base runtime libs ───────────────────────────────────────────────────
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         libstdc++6 \
@@ -44,23 +77,59 @@ RUN apt-get update && \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Qualcomm fastrpc RUNTIME library only (not -dev headers)
+
+# ─── Qualcomm runtime (dmabufheap + firmware) ────────────────────────────
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         software-properties-common && \
     apt-add-repository -s ppa:ubuntu-qcom-iot/qcom-ppa && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        qcom-fastrpc1 \
         qcom-libdmabufheap \
         firmware-qcom-hlosfw && \
     apt-get remove -y --purge software-properties-common && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
+
+# ─── Copy FastRPC runtime (built above) ───────────────────────────────────
+COPY --from=fastrpc-builder \
+    /tmp/fastrpc-install/usr/lib/aarch64-linux-gnu/ \
+    /usr/lib/aarch64-linux-gnu/
+
+
+# ─── DSP staging + FastRPC config ────────────────────────────────────────
+RUN mkdir -p /usr/lib/rfsa/adsp && \
+    mkdir -p /etc/fastrpc && \
+    mkdir -p /run && \
+    \
+    # ✅ Fallback machine name (only used if host does not provide one)
+    echo "Qualcomm Technologies, Inc. Addons IQ 9075 EVK" > /run/device-model && \
+    \
+    # ✅ FastRPC machine → DSP mapping (must match runtime machine string EXACTLY)
+    { \
+      echo '# SPDX-License-Identifier: MIT'; \
+      echo 'machines:'; \
+      echo '  Qualcomm Technologies, Inc. Monaco Monza addons:'; \
+      echo '    DSP_LIBRARY_PATH: qcs8300/Qualcomm/QCS8300-RIDE/dsp'; \
+      echo '  Qualcomm Technologies, Inc. Addons IQ 9075 EVK:'; \
+      echo '    DSP_LIBRARY_PATH: qcm6490/Thundercomm/RB3gen2/dsp'; \
+      echo '  Qualcomm Technologies, Inc. IQ8 8275 Pro SKU EVK:'; \
+      echo '    DSP_LIBRARY_PATH: qcs8300/Qualcomm/QCS8300-RIDE/dsp'; \
+    } > /etc/fastrpc/hexagon-dsp-binaries.yaml && \
+    \
+    chmod 644 /etc/fastrpc/hexagon-dsp-binaries.yaml
+
+
+# ✅ Tell FastRPC where to read machine name
+ENV MACHINE_NAME_PATH=/run/device-model
+
+
+# ─── Metadata ───────────────────────────────────────────────────────────
 LABEL org.opencontainers.image.title="GenAI-Studio-Runtime"
 LABEL org.opencontainers.image.description="Ubuntu 24.04 ARM64 + Qualcomm fastrpc runtime (no build tools)"
-LABEL org.opencontainers.image.version="1.0.0"
+LABEL org.opencontainers.image.version="1.2.0"
 LABEL org.opencontainers.image.vendor="Qualcomm Innovation Center"
+
 
 CMD ["/bin/bash"]

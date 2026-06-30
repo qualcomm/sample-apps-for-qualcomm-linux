@@ -67,14 +67,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 # Stored at /opt/headers/ — service Dockerfiles copy from here.
 ARG HTTPLIB_VERSION=v0.15.3
 ARG NLOHMANN_VERSION=v3.11.3
+ARG STB_VERSION=master
 
-RUN mkdir -p /opt/headers/httplib /opt/headers/nlohmann && \
+RUN mkdir -p /opt/headers/httplib /opt/headers/nlohmann /opt/headers/stb && \
     wget -q --tries=3 --timeout=30 \
         "https://raw.githubusercontent.com/yhirose/cpp-httplib/${HTTPLIB_VERSION}/httplib.h" \
         -O /opt/headers/httplib/httplib.h && \
     wget -q --tries=3 --timeout=30 \
         "https://raw.githubusercontent.com/nlohmann/json/${NLOHMANN_VERSION}/single_include/nlohmann/json.hpp" \
-        -O /opt/headers/nlohmann/json.hpp
+        -O /opt/headers/nlohmann/json.hpp && \
+    wget -q --tries=3 --timeout=30 \
+        "https://raw.githubusercontent.com/nothings/stb/${STB_VERSION}/stb_image_write.h" \
+        -O /opt/headers/stb/stb_image_write.h
 
 # ─── Step 3: QAIRT SDK slice (Genie + QNN headers + libGenie.so) ─────────────
 # Baked into the base image so ALL service Dockerfiles share one copy.
