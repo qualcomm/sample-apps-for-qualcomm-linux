@@ -1,0 +1,105 @@
+{
+  "cdiVersion": "1.1.0",
+  "kind": "qualcomm.com/device",
+  "devices": [
+    {
+      "name": "cdi-hw-acc",
+      "containerEdits": {
+        "env": [
+          "GST_DEBUG_NO_COLOR=1",
+          "GST_DEBUG=2",
+          "GST_PLUGIN_SCANNER=\"/usr/lib/aarch64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner\"",
+          "XDG_RUNTIME_DIR=/run/user/1000",
+          "WAYLAND_DISPLAY=/run/wayland-0",
+          "VK_DRIVER_FILES=/usr/share/vulkan/icd.d/adrenovk.json",
+          "OCL_ICD_FILENAMES=/usr/lib/aarch64-linux-gnu/libOpenCL_adreno.so.1",
+          "__EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/10_adreno.json",
+          "DISPLAY_SOCKET=/run/wayland-0",
+          "AUDIO_SOCKET=/run/pulse/native"
+        ],
+        "deviceNodes": [
+          {
+            "path": "/dev/video0",
+            "uid": 0,
+            "gid": 44
+          },
+          {
+            "path": "/dev/video1",
+            "uid": 0,
+            "gid": 44
+          },
+          {
+            "path": "/dev/video32",
+            "uid": 0,
+            "gid": 44
+          },
+          {
+            "path": "/dev/video33",
+            "uid": 0,
+            "gid": 44
+          },
+          {
+            "path": "/dev/dri/card0",
+            "uid": 0,
+            "gid": 44
+          },
+          {
+            "path": "/dev/dri/renderD128",
+            "uid": 0,
+            "gid": 1000
+          },
+          {
+            "path": "/dev/kgsl-3d0",
+            "uid": 0,
+            "gid": 1000
+          },
+          {
+            "path": "/dev/dma_heap/system",
+            "uid": 0,
+            "gid": 1000
+          },
+          {
+            "path": "/dev/fastrpc-cdsp",
+            "fileMode": 432,
+            "uid": 0,
+            "gid": 44
+          },
+          {
+            "path": "/dev/fastrpc-cdsp1",
+            "fileMode": 432,
+            "uid": 0,
+            "gid": 44
+          }
+        ],
+        "mounts": [
+          {
+            "hostPath": "/etc/configs",
+            "containerPath": "/etc/configs",
+            "options": ["rbind", "rw"]
+          },
+          {
+            "hostPath": "/run/wayland-0",
+            "containerPath": "/run/wayland-0",
+            "options": ["rbind", "rw"]
+          },
+          {
+            "hostPath": "/run/pulse/native",
+            "containerPath": "/run/pulse/native",
+            "options": ["rbind", "rw"]
+          },
+          {
+            "hostPath": "/usr/share/qcom/sa8775p/Qualcomm/SA8775P-RIDE/dsp",
+            "containerPath": "/usr/lib/dsp",
+            "options": ["rbind"]
+          },
+          {
+            "hostPath": "/sys/firmware/devicetree/base/model",
+            "containerPath": "/run/device-model",
+            "options": ["rbind"]
+          }
+        ]
+      }
+    }
+  ]
+}
+
