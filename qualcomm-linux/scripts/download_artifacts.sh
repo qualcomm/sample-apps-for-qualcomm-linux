@@ -45,6 +45,7 @@ copy_videos() {
     # echo "Copying ${media_file}"
     for i in $(seq 2 16); do
         cp "${output_media_dir}/${media_file}" "${output_media_dir}/video${i}.mp4"
+    cp "${output_media_dir}/${media_file}" "${output_media_dir}/video_out.mp4"
     done
 }
 
