@@ -97,7 +97,20 @@ printf '{\n  "features": {\n    "cdi": true\n  }\n}\n' | sudo tee /etc/docker/da
 TMP_DIR=$(mktemp -d)
 git clone --depth 1 https://github.com/quic/sample-apps-for-qualcomm-linux.git "$TMP_DIR/sample-apps"
 sudo install -d /etc/cdi
-sudo cp "$TMP_DIR/sample-apps/GenAI-Solutions/GenAI-Studio/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json
+```
+
+**For QLI 2.x, Run the following command**
+```bash
+sudo cp "$TMP_DIR/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json
+```
+
+**For QLI 1.x Or Canonical Ubuntu, Run the following command**
+```bash
+sudo cp "$TMP_DIR/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/1.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json
+```
+
+**Finalize Setup**
+```bash
 sudo chmod 644 /etc/cdi/docker-run-cdi-hw-acc.json
 rm -rf "$TMP_DIR"
 
