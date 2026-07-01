@@ -23,7 +23,7 @@ args = parser.parse_args()
 MODEL_PATH = "/etc/models/yolox_quantized.tflite"
 LABEL_PATH = "/etc/labels/coco_labels.txt"
 VIDEO_IN = "/etc/media/video.mp4"
-VIDEO_OUT = "output_object_detection.mp4"
+VIDEO_OUT = "/tmp/output_object_detection.mp4"
 DELEGATE_PATH = "libQnnTFLiteDelegate.so"
 
 FRAME_W, FRAME_H = 1080, 720
