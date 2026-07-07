@@ -71,6 +71,8 @@ echo "Installing qai_hub package..."
 pip install python-git
 pip install qai-hub
 pip install "qai-hub-models[yolov8-det]"
+pip install torch==2.8.0
+pip install torchvision==0.23.0
 
 # Configure qai_hub with API token
 echo "Configuring qai_hub..."
