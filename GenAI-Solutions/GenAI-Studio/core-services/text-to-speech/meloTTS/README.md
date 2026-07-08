@@ -19,10 +19,10 @@ Canonical build/run/rebuild commands live in repo-root `README.md`:
 Target preflight:
 
 ```bash
-test -d /opt/genai-studio-models/text-to-speech/melo-tts-v73/files
-test -d /opt/qairt/current/qairt_245_flat_libs
-test -d core-services/text-to-speech/meloTTS/melo_sdk || \
-  test -f core-services/text-to-speech/meloTTS/1.1.1.0.zip
+test -d /opt/genai-studio-models/text-to-speech/melo-tts-v73/files && echo "Text-to-Speech model directory OK"
+test -d /opt/qairt/current/qairt_245_flat_libs && echo "QAIRT flat libs OK"
+test -d core-services/text-to-speech/meloTTS/melo_sdk && echo "melo_sdk present" || \
+  test -f core-services/text-to-speech/meloTTS/1.1.1.0.zip && echo "melo_sdk 1.1.1.0.zip present"
 
 echo $HOST_RPC_LIB_DIR
 ls -l "$HOST_RPC_LIB_DIR/libcdsprpc.so" \

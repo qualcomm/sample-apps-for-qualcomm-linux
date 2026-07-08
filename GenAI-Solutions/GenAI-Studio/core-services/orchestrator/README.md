@@ -34,8 +34,8 @@ It depends on backend services and mounted paths (especially I2T model path and 
 Minimum checks before starting orchestrator:
 
 ```bash
-docker ps --format '{{.Names}}' | egrep 'text-to-text|image-to-text|text-to-image|speech-to-text|text-to-speech' || true
-test -d /opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
+docker ps --format '{{.Names}}' | egrep 'text-to-text|image-to-text|text-to-image|speech-to-text|text-to-speech' && echo "Dependent services running" || echo "Some dependent services not running"
+test -d /opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files && echo "Image-to-Text model directory OK"
 echo "${HF_CACHE_HOST_DIR:-/opt/genai-studio-cache/huggingface}"
 ```
 

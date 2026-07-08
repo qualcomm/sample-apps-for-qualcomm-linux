@@ -17,9 +17,9 @@ Canonical build/run/rebuild commands live in repo-root `README.md`:
 Quick checks on target:
 
 ```bash
-test -d core-services/speech-to-text/whisper_sdk
-test -d /opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075
-test -d /opt/qairt/current/qairt_245_flat_libs
+test -d core-services/speech-to-text/whisper_sdk && echo "whisper_sdk present"
+test -d /opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075 && echo "Speech-to-Text model directory OK"
+test -d /opt/qairt/current/qairt_245_flat_libs && echo "QAIRT flat libs OK"
 ```
 ## Build and Start Service
 

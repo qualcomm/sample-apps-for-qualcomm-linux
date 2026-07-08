@@ -46,7 +46,7 @@ For full stack bring-up, refer to `README.md` [section 7) Start services with do
 Health:
 
 ```bash
-curl -sS http://localhost:8080/health | jq .
+curl -sS http://localhost:8080/health
 test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/v1/responses -H 'Content-Type: application/json' -d '{}')" = "400" && echo "/v1/responses route OK"
 ```
 
@@ -83,7 +83,7 @@ curl -sS -X POST http://localhost:8080/v1/responses \
     "input":[{"role":"user","content":[{"type":"input_text","text":"Say hello."}]}],
     "stream":false,
     "max_output_tokens":64
-  }' | jq .
+  }'
 ```
 
 Expected response shape:
@@ -114,7 +114,7 @@ curl -sS -X POST http://localhost:8080/v1/responses \
     }],
     "stream":false,
     "max_output_tokens":96
-  }' | jq .
+  }'
 ```
 
 Expected response shape:
@@ -137,7 +137,7 @@ curl -sS -X POST http://localhost:8090/v1/responses \
     "model":"qwen2.5-vl-7b-instruct",
     "input":[{"role":"user","content":[{"type":"input_text","text":"Describe this image."},{"type":"input_image","image_url":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+tmn8AAAAASUVORK5CYII="}]}],
     "stream":false
-  }' | jq .
+  }'
 ```
 
 Expected response shape:

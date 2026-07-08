@@ -137,34 +137,7 @@ normalize_adsp_path() {
     printf '%s' "${input}" | tr ':' ';'
 }
 
-# Guard against a known host bind-mount failure mode:
-# source file path missing on host => Docker creates a directory at the bind source path.
-for lib_path in \
-    /usr/lib/libcdsprpc.so \
-    /usr/lib/libcdsprpc.so.1 \
-    /usr/lib/libcdsprpc.so.1.0.0 \
-    /usr/lib/libdmabufheap.so.0; do
-    if [[ -d "${lib_path}" ]]; then
-        echo "[run] ERROR: expected shared-library file but found directory: ${lib_path}"
-        echo "[run] Fix host bind-mount source paths (use /usr/lib/aarch64-linux-gnu/*) and recreate container."
-        exit 1
-    fi
-done
-
-# Some targets expose only libcdsprpc.so.1.0.0 via volume mount.
-# Ensure SONAME symlink exists for runtime linker resolution.
-if [[ -f /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1.0.0 ]] && [[ ! -e /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1 ]]; then
-    ln -sf /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1.0.0 /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1 || true
-fi
-if [[ -f /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1 ]] && [[ ! -e /usr/lib/libcdsprpc.so.1 ]]; then
-    ln -sf /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1 /usr/lib/libcdsprpc.so.1 || true
-fi
-if [[ -f /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1.0.0 ]] && [[ ! -e /usr/lib/libcdsprpc.so.1.0.0 ]]; then
-    ln -sf /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1.0.0 /usr/lib/libcdsprpc.so.1.0.0 || true
-fi
-if [[ -f /usr/lib/aarch64-linux-gnu/libcdsprpc.so ]] && [[ ! -e /usr/lib/libcdsprpc.so ]]; then
-    ln -sf /usr/lib/aarch64-linux-gnu/libcdsprpc.so /usr/lib/libcdsprpc.so || true
-fi
+# removed guards against missing fastrpc libs here
 
 DEFAULT_ADSP_LIBRARY_PATH="${MODEL_DIR};/usr/lib/rfsa/adsp;/usr/lib/dsp;/usr/lib/dsp/cdsp;/dsp;/usr/lib/dsp/cdsp1"
 if [[ -d "${QAIRT_FLAT_LIB_DIR}" ]]; then
@@ -210,6 +183,7 @@ if ! compgen -G "${MODEL_DIR}/*.qnn" > /dev/null; then
     echo "[run] ERROR: no .qnn model found under ${MODEL_DIR}"
     exit 1
 fi
+
 
 echo "============================================================"
 echo " MeloTTS Service (melo_sdk C++ backend)"

@@ -109,8 +109,55 @@ Each functional block (Speech-To-Text, Text-to-Text, Text-to-Image, Text-to-Spee
 - Minimum 16GB RAM, 50GB storage
 
 ## Quick Start
+ 
+### For first time startup on a new device, please follow [`docs/setup/DEVICE_SETUP.md`](docs/setup/DEVICE_SETUP.md) before proceeding.
 
-### 1) Host-side private sdk preparation (optional)
+### 1) Target preflight checks
+
+```bash
+# Verify docker and python
+docker --version
+docker compose version
+python3 --version
+ls -l /dev/fastrpc-cdsp
+ls /etc/cdi/
+
+# Verify QAIRT flat libs 
+ls -la /opt/qairt/current/qairt_245_flat_libs/ 2>/dev/null || echo "QAIRT flat libs not yet staged"
+```
+If any checks fail, please refer to [`DEVICE_SETUP.md`](docs/setup/DEVICE_SETUP.md) to fix device provisioning.
+
+### 2) Target model preparation
+
+Prepare the model folders under `/opt/genai-studio-models/`. Refer to each service's model setup doc for acquisition details:
+
+| Service | Target Path | Setup Doc |
+|---|---|---|
+| Text-To-Text | `/opt/genai-studio-models/text-to-text/...` | [`core-services/text-to-text/MODEL_SETUP.md`](core-services/text-to-text/MODEL_SETUP.md) |
+| Image-To-Text | `/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files` | [`core-services/image-to-text/MODEL_SETUP.md`](core-services/image-to-text/MODEL_SETUP.md) |
+| Text-To-Image | `/opt/genai-studio-models/text-to-image/stable_diffusion_v2_1-qnn_context_binary-w8a16-qualcomm_qcs9075` | [`core-services/text-to-image/MODEL_SETUP.md`](core-services/text-to-image/MODEL_SETUP.md) |
+| Speech-To-Text | `/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075` | [`core-services/speech-to-text/MODEL_SETUP.md`](core-services/speech-to-text/MODEL_SETUP.md) |
+| Text-To-Speech | `/opt/genai-studio-models/text-to-speech/melo-tts-v73/files` | [`core-services/text-to-speech/meloTTS/Model-Generation.md`](core-services/text-to-speech/meloTTS/Model-Generation.md) |
+
+### 3) Clone the repository
+
+Clone the repository to the appropriate location based on your target platform:
+- **Ubuntu and QLI 1.9**: Clone directly on the target device
+- **QLI 2.0**: Clone on the host machine, then transfer to the target device
+
+```bash
+# On target (Ubuntu/QLI 1.9)
+git clone https://github.com/qualcomm/sample-apps-for-qualcomm-linux.git
+cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
+
+# On host (QLI 2.0)
+git clone https://github.com/qualcomm/sample-apps-for-qualcomm-linux.git
+scp -r sample-apps-for-qualcomm-linux ubuntu@<target-host>:/opt #/opt is recommended
+# On target (QLI 2.0)
+cd /path/to/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
+```
+
+### 4) Host-side private SDK preparation (optional)
 
 Run this only if you are bringing up the full stack or any private STT or TTS service.
 
@@ -133,71 +180,25 @@ rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/melo_sdk/ \
 - `VoiceAI_ASR` must be staged to `core-services/speech-to-text/whisper_sdk`.
 - `VoiceAI_TTS` must be staged to `core-services/text-to-speech/meloTTS/melo_sdk` (or use `1.1.1.0.zip` fallback in the same folder).
 
-### 2) Target preflight checks and runtime preparation 
-
-Execute on the target device from the repository root directory. 
-For initial device provisioning, refer to `docs/setup/DEVICE_SETUP.md` before proceeding.
-
-```bash
-# Verify docker and python
-docker --version
-docker compose version
-python3 --version
-ls -l /dev/fastrpc-cdsp
-ls /etc/cdi/
-
-# Verify QAIRT flat libs and fastrpc lib paths
-ls -la /opt/qairt/current/qairt_245_flat_libs/ 2>/dev/null || echo "QAIRT flat libs not yet staged"
-
-# Detect and persist the host RPC library location to .env
-unset HOST_RPC_LIB_DIR
-for d in /usr/lib/aarch64-linux-gnu /usr/lib; do
-  if [ -f "$d/libcdsprpc.so.1" ] && [ -f "$d/libdmabufheap.so.0" ]; then
-    export HOST_RPC_LIB_DIR="$d"
-    break
-  fi
-done
-[ -n "$HOST_RPC_LIB_DIR" ] || { echo "ERROR: host RPC libs not found"; exit 1; }
-
-echo "HOST_RPC_LIB_DIR=$HOST_RPC_LIB_DIR" > .env
-cat .env
-```
-
-**Important:** Do not hardcode `HOST_RPC_LIB_DIR`; detect it per device and persist in `.env`. This ensures the variable is available across different shell sessions and subsequent setup steps.
-
-If any checks fail, refer to `DEVICE_SETUP.md` to fix device provisioning.
-
-### 3) Target model preparation
-
-Prepare the model folders under `/opt/genai-studio-models/`. Refer to each service's model setup doc for acquisition details:
-
-| Service | Target Path | Setup Doc |
-|---|---|---|
-| Text-To-Text | `/opt/genai-studio-models/text-to-text/...` | `core-services/text-to-text/MODEL_SETUP.md` |
-| Image-To-Text | `/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files` | `core-services/image-to-text/MODEL_SETUP.md` |
-| Text-To-Image | `/opt/genai-studio-models/text-to-image/stable_diffusion_v2_1-qnn_context_binary-w8a16-qualcomm_qcs9075` | `core-services/text-to-image/MODEL_SETUP.md` |
-| Speech-To-Text | `/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075` | `core-services/speech-to-text/MODEL_SETUP.md` |
-| Text-To-Speech | `/opt/genai-studio-models/text-to-speech/melo-tts-v73/files` | `core-services/text-to-speech/meloTTS/Model-Generation.md` |
-
-### 4) Target shared build preparation
+### 5) Target shared build preparation
 
 Download QAIRT SDK and build base images (one-time setup):
 
 ```bash
 bash scripts/download-qairt-sdk.sh --service base
-test -d qairt-sdk/include/Genie
-test -d qairt-sdk/include/QNN
+test -d qairt-sdk/include/Genie && echo "qairt-sdk/include/Genie OK"
+test -d qairt-sdk/include/QNN && echo "qairt-sdk/include/QNN OK"
 
-test -d core-services/speech-to-text/whisper_sdk
-test -d core-services/text-to-speech/meloTTS/melo_sdk || \
-  test -f core-services/text-to-speech/meloTTS/1.1.1.0.zip
+test -d core-services/speech-to-text/whisper_sdk && echo "whisper_sdk present"
+test -d core-services/text-to-speech/meloTTS/melo_sdk && echo "melo_sdk present" || \
+  test -f core-services/text-to-speech/meloTTS/1.1.1.0.zip && echo "melo_sdk 1.1.1.0.zip present"
 
 bash scripts/pull-ubuntu-arm64.sh
 DOCKER_BUILDKIT=1 docker build --progress=plain -f Dockerfile.runtime -t ubuntu-runtime:24.04 .
 DOCKER_BUILDKIT=1 docker build --progress=plain -f Dockerfile.build-base -t genai-build-base:latest .
 ```
 
-### 5) Service binary and payload requirements
+### 6) Service binary and payload requirements
 
 Ensure all required files are in place before building service images:
 
@@ -210,7 +211,7 @@ Ensure all required files are in place before building service images:
 | text-to-speech | `core-services/text-to-speech/meloTTS/melo_sdk` or `1.1.1.0.zip` (build-time), runtime model with `.qnn` + `libtts_impl_skel.so` | `TTS_MODEL_HOST_DIR` |
 | orchestrator | No private SDK; depends on upstream services and `/var/run/docker.sock` | N/A |
 
-### 6) Build service images
+### 7) Build service images
 
 ```bash
 DOCKER_BUILDKIT=1 docker build --progress=plain -t text-to-text:latest core-services/text-to-text/
@@ -221,10 +222,27 @@ DOCKER_BUILDKIT=1 docker build --progress=plain -t text-to-speech:latest core-se
 DOCKER_BUILDKIT=1 docker build --progress=plain -t orchestrator:latest core-services/orchestrator/
 ```
 
-### 7) Start services with docker compose
+### 8) Start services with Docker Compose
 
-Export required environment variables and start the stack:
+Start the full stack:
 
+```bash
+docker compose up -d
+```
+
+**NOTE**: Only text-to-text, text-to-speech, and image-to-text are currently supported on QLI 2.0. For QLI 2.0, run:
+```bash
+docker compose up -d text-to-text text-to-speech image-to-text orchestrator --no-deps
+```
+
+Once all services are running, you can:
+- **Access via Orchestrator** – The web UI is accessible at **`http://<device-ip>:8090`** on your host machine.
+- **Integrate with OpenAI-compatible clients** – Use the service endpoints directly in any OpenAI-compatible application (see integration examples in [`solutions/README.md`](solutions/README.md))
+- **Run validation tests** – Proceed to the [Validation and Testing](#validation-and-testing) section to verify all services are functioning correctly
+
+#### Environment Variable Configuration (Optional)
+
+The following environment variables can be customized if your paths differ from the default configuration. These are the default values:
 ```bash
 export TG_QAIRT_LIBS_HOST_DIR=/opt/qairt/current/qairt_245_flat_libs
 export I2T_QAIRT_FLAT_LIB_DIR=/opt/qairt/current/qairt_245_flat_libs
@@ -243,20 +261,8 @@ export IMAGE_TO_TEXT_IMAGE=image-to-text:responses-v1
 export HF_CACHE_HOST_DIR=/opt/genai-studio-cache/huggingface
 mkdir -p "$HF_CACHE_HOST_DIR"
 
-export TTS_ADSP_HOST_DIR=/opt/genai-studio-models/text-to-speech/melo-tts-v73/adsp_runtime_newdevice_bsp/adsp
-if [ ! -f "$TTS_ADSP_HOST_DIR/libtts_impl_skel.so" ] && \
-   [ -f /opt/genai-studio-models/text-to-speech/melo-tts-v73/adsp_runtime_olddevice_backup/adsp/libtts_impl_skel.so ]; then
-  export TTS_ADSP_HOST_DIR=/opt/genai-studio-models/text-to-speech/melo-tts-v73/adsp_runtime_olddevice_backup/adsp
-fi
-
-docker compose down --remove-orphans
-docker compose up -d
+export TTS_ADSP_HOST_DIR=/opt/genai-studio-models/text-to-speech/melo-tts-v73/files
 ```
-
-Once all services are running, you can:
-- **Integrate with OpenAI-compatible clients** – Use the service endpoints directly in any OpenAI-compatible application (see integration examples in [`solutions/README.md`](solutions/README.md))
-- **Access via Orchestrator** – Route all requests through the unified gateway at `http://<device-ip>:8090` for simplified multi-service orchestration
-- **Run validation tests** – Proceed to the [Validation and Testing](#validation-and-testing) section to verify all services are functioning correctly 
 
 ## Validation and Testing
 
@@ -285,7 +291,7 @@ docker compose ps
 
 ### 2) Service health checks and functional tests
 
-**Step 1: Health checks**
+**Step 1: Health checks (Run on target device)**
 
 Verify all services are running:
 
@@ -298,7 +304,7 @@ curl -sf http://127.0.0.1:8088/health >/dev/null && echo "Text-to-Text (8088) OK
 curl -sf http://127.0.0.1:8090/api/status >/dev/null && echo "Orchestrator (8090) OK"
 ```
 
-**Step 2: Run the unified test suite**
+**Step 2: Run the unified test suite (Run on host machine)**
 
 ```bash
 python3 -m pip install --user -r tests/unified/requirements.txt
@@ -386,9 +392,9 @@ Refer to `docs/SIX_SERVICE_PAIN_POINTS.md` for known issues and solutions, or `d
 
 To bring up only one service:
 
-1. Build only that service image from [section 6) Build service images](#6-build-service-images).
+1. Build only that service image from [section 7) Build service images](#7-build-service-images)
 2. Start only that container: `docker compose up -d <service-name>`
-3. Run that service's functional test from [section 3) Functional endpoint tests](#3-functional-endpoint-tests).
+3. Run that service's functional test from [section 3) Functional endpoint tests](#3-functional-endpoint-tests)
 
 Each service has its own documentation:
 

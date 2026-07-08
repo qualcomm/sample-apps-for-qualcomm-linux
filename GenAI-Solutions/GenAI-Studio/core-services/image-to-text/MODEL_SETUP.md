@@ -74,9 +74,10 @@ Quick check:
 ```bash
 MODEL_DIR=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
 ls -lah "${MODEL_DIR}"
-for f in libGenie.so image_encoder.json lut_encoder.json text_generator.json; do
-  test -f "${MODEL_DIR}/${f}" || echo "missing: ${f}"
-done
+test -f "${MODEL_DIR}/libGenie.so" && echo "libGenie.so OK"
+test -f "${MODEL_DIR}/image_encoder.json" && echo "image_encoder.json OK"
+test -f "${MODEL_DIR}/lut_encoder.json" && echo "lut_encoder.json OK"
+test -f "${MODEL_DIR}/text_generator.json" && echo "text_generator.json OK"
 ```
 
 ## 5) QAIRT Runtime Validation

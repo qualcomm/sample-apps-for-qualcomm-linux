@@ -18,7 +18,7 @@
 #     if [ -f "$d/libcdsprpc.so.1" ] && [ -f "$d/libdmabufheap.so.0" ]; then
 #       export HOST_RPC_LIB_DIR="$d"; break
 #     fi
-#   done //not doing this; directly getting fastrpc from source
+#   done
 # =============================================================================
 
 x-cdi-device: &cdi-device
@@ -37,7 +37,7 @@ services:
     image: text-to-text:latest
     platform: linux/arm64
     container_name: text-to-text
-    restart: on-failure:5
+    restart: no
     network_mode: host
     environment:
       - TG_BIND_HOST=${TG_BIND_HOST:-0.0.0.0}
@@ -49,14 +49,10 @@ services:
       - BASE_DIR=${BASE_DIR:-/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075}
       - TG_MODEL_ID_OVERRIDE=${TG_MODEL_ID_OVERRIDE:-}
       - QAIRT_VERSION_HINT=${TG_QAIRT_VERSION_HINT:-build=2.45.0.260326;runtime=/opt/qairt/current/qairt_245_flat_libs}
-      - LD_LIBRARY_PATH=${TG_LD_LIBRARY_PATH:-/opt/qairt/current/qairt_245_flat_libs:/usr/lib:/usr/lib/aarch64-linux-gnu}
-      - ADSP_LIBRARY_PATH=${TG_ADSP_LIBRARY_PATH:-/opt/qairt/current/qairt_245_flat_libs;/usr/lib/rfsa/adsp;/usr/lib/dsp;/dsp;/usr/lib/dsp/cdsp1}
     volumes:
       - ${TG_MODEL_HOST_DIR:-/opt/genai-studio-models/text-to-text}:/opt/genai-studio-models/text-to-text:ro
       - ${TG_QAIRT_LIBS_HOST_DIR:-/opt/qairt/current/qairt_245_flat_libs}:/opt/qairt/current/qairt_245_flat_libs:ro
-      - /usr/lib/rfsa/adsp:/usr/lib/rfsa/adsp:ro
-      - /usr/lib/dsp:/usr/lib/dsp:ro
-      - /usr/share/qcom:/usr/share/qcom:ro
+      - /dev/fastrpc-cdsp:/dev/fastrpc-cdsp
     <<: *cdi-device
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8088/health"]
@@ -77,15 +73,12 @@ services:
       - QAIRT_ROOT=${I2T_QAIRT_ROOT:-/opt/qairt/current}
       - QAIRT_FLAT_LIB_DIR=${I2T_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}
       - QAIRT_VERSION_HINT=${I2T_QAIRT_VERSION_HINT:-build=2.45.0.260326;runtime=/opt/qairt/current/qairt_245_flat_libs}
-      - LD_LIBRARY_PATH=${I2T_LD_LIBRARY_PATH:-/opt/qairt/current/qairt_245_flat_libs:/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files:/usr/lib:/usr/lib/aarch64-linux-gnu:/etc/fastrpc}
-      - ADSP_LIBRARY_PATH=${I2T_ADSP_LIBRARY_PATH:-/opt/qairt/current/qairt_245_flat_libs;/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files;/usr/lib/rfsa/adsp;/usr/lib/dsp;/dsp;/usr/lib/dsp/cdsp1}
+      - ADSP_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs
+      - LD_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs;/usr/lib/aarch64-linux-gnu
     volumes:
       - ${I2T_MODEL_HOST_DIR:-/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files}:/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files:rw
       - ${I2T_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}:/opt/qairt/current/qairt_245_flat_libs:ro
       - /tmp/genai-studio-lock:/opt/genai-lock
-      - /usr/lib/rfsa/adsp:/usr/lib/rfsa/adsp:ro
-      - /usr/lib/dsp:/usr/lib/dsp:ro
-      - /usr/share/qcom:/usr/share/qcom:ro
     <<: *cdi-device
     healthcheck:
       test:
@@ -121,22 +114,12 @@ services:
       - IMAGEGEN_TRANSIENT_RETRY_ATTEMPTS=${IMAGEGEN_TRANSIENT_RETRY_ATTEMPTS:-48}
       - IMAGEGEN_TRANSIENT_RETRY_BACKOFF_MS=${IMAGEGEN_TRANSIENT_RETRY_BACKOFF_MS:-1500}
       - TOKENIZER_DIR=/opt/runtime/tokenizer
-      - LD_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs:/opt/runtime:/usr/lib:/usr/lib/aarch64-linux-gnu
-      - ADSP_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs;/opt/runtime;/usr/lib/rfsa/adsp;/usr/lib/dsp;/dsp;/usr/lib/dsp/cdsp1
-    devices:
-      - /dev/fastrpc-cdsp
-      - /dev/fastrpc-cdsp-secure
-      - /dev/fastrpc-cdsp1
-      - /dev/fastrpc-cdsp1-secure
-      - /dev/fastrpc-adsp-secure
     group_add:
       - "125"
     volumes:
       - ${IMAGEGEN_MODEL_DIR:-/opt/genai-studio-models/text-to-image/stable_diffusion_v2_1-qnn_context_binary-w8a16-qualcomm_qcs9075}:/opt/runtime:ro
       - ${IMG_QAIRT_LIBS_HOST_DIR:-/opt/qairt/current/qairt_245_flat_libs}:/opt/qairt/current/qairt_245_flat_libs:ro
       - /tmp/genai-studio-lock:/opt/genai-lock
-      - /usr/lib/rfsa/adsp:/usr/lib/rfsa/adsp:ro
-      - /usr/lib/dsp:/usr/lib/dsp:ro
       - /usr/share/qcom:/usr/share/qcom:ro
       - /usr/lib/dsp/cdsp1/libc++.so.1:/usr/lib/dsp/cdsp1/libc++.so.1:ro
       - /usr/lib/dsp/cdsp1/libc++abi.so.1:/usr/lib/dsp/cdsp1/libc++abi.so.1:ro
@@ -154,26 +137,26 @@ services:
     restart: on-failure:5
     network_mode: host
     privileged: true
+
     environment:
       - MODEL_PATH=/opt/ASR_binary/Whisper/
       - QNN_LIB_DIR=/opt/qnn-host
       - QAIRT_VERSION_HINT=${STT_QAIRT_VERSION_HINT:-runtime=2.45.0.260326}
       - ASR_ASSETS_DIR=/opt/asr-assets
-      - ASR_REALTIME_MAX_SESSIONS=${ASR_REALTIME_MAX_SESSIONS:-100}
-      - ASR_REALTIME_MAX_PENDING_PCM_MB_PER_SESSION=${ASR_REALTIME_MAX_PENDING_PCM_MB_PER_SESSION:-16}
-      - ASR_REALTIME_MAX_TOTAL_PENDING_PCM_MB=${ASR_REALTIME_MAX_TOTAL_PENDING_PCM_MB:-256}
-      - LD_LIBRARY_PATH=${STT_LD_LIBRARY_PATH:-/opt/qnn-host:/opt/host-libs:/usr/lib:/usr/lib/aarch64-linux-gnu}
+      - LD_LIBRARY_PATH=/opt/qnn-host:/usr/lib:/usr/lib/aarch64-linux-gnu
+
     group_add:
       - "125"
+
     volumes:
       - ${STT_MODEL_HOST_DIR:-/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075}:/opt/ASR_binary/Whisper:ro
       - ${STT_QNN_LIB_HOST_DIR:-/opt/qairt/current/qairt_245_flat_libs}:/opt/qnn-host:ro
-      - ${HOST_RPC_LIB_DIR:-/usr/lib/aarch64-linux-gnu}/libcdsprpc.so.1.0.0:/opt/host-libs/libcdsprpc.so.1.0.0:ro
-      - ${HOST_RPC_LIB_DIR:-/usr/lib/aarch64-linux-gnu}/libcdsprpc.so.1:/opt/host-libs/libcdsprpc.so.1:ro
-      - ${HOST_RPC_LIB_DIR:-/usr/lib/aarch64-linux-gnu}/libcdsprpc.so:/opt/host-libs/libcdsprpc.so:ro
-      - /usr/lib/rfsa/adsp:/usr/lib/rfsa/adsp:ro
       - /usr/lib/dsp:/usr/lib/dsp:ro
       - /usr/share/qcom:/usr/share/qcom:ro
+
+    devices:
+      - /dev/fastrpc-cdsp
+
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8081/health"]
       interval: 30s
@@ -195,29 +178,27 @@ services:
       - QAIRT_FLAT_LIB_DIR=${TTS_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}
       - LD_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs:/opt/TTS_binary/MeloTTS:/opt/host-libs:/usr/lib:/usr/lib/aarch64-linux-gnu
       - DSP_LIBRARY_PATH=/opt/TTS_binary/MeloTTS
-      - ADSP_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs;/opt/TTS_binary/MeloTTS;/usr/lib/rfsa/adsp;/usr/lib/dsp;/usr/lib/dsp/cdsp;/dsp;/usr/lib/dsp/cdsp1
+    volumes:
+      - ./core-services/text-to-speech/meloTTS/run.sh:/app/run.sh:ro
+      - ${TTS_MODEL_HOST_DIR:-/opt/genai-studio-models/text-to-speech/melo-tts-v73/files}:/opt/TTS_binary/MeloTTS:ro
+      - ${TTS_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}:/opt/qairt/current/qairt_245_flat_libs:ro
+      - ${FAST_RPC_SHELL_PATH:-/usr/share/qcom/sa8775p/Qualcomm/IQ9075-EVK/dsp/cdsp/fastrpc_shell_unsigned_3}:/usr/lib/dsp/fastrpc_shell_unsigned_3:ro
+      - /usr/share/qcom:/usr/share/qcom:ro
     command: ["/bin/bash", "/app/run.sh", "--model-path", "/opt/TTS_binary/MeloTTS", "--language", "English", "--port", "8083"]
+
     devices:
       - /dev/fastrpc-cdsp
       - /dev/fastrpc-cdsp-secure
       - /dev/fastrpc-cdsp1
       - /dev/fastrpc-cdsp1-secure
       - /dev/fastrpc-adsp-secure
-    group_add:
-      - "125"
-    volumes:
-      - ./core-services/text-to-speech/meloTTS/run.sh:/app/run.sh:ro
-      - ${TTS_MODEL_HOST_DIR:-/opt/genai-studio-models/text-to-speech/melo-tts-v73/files}:/opt/TTS_binary/MeloTTS:ro
-      - ${TTS_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}:/opt/qairt/current/qairt_245_flat_libs:ro
-      - /usr/lib/dsp:/usr/lib/dsp:ro
-      - /usr/share/qcom:/usr/share/qcom:ro
+
     healthcheck:
       test: ["CMD-SHELL", "bash -lc 'exec 3<>/dev/tcp/127.0.0.1/8083'"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 30s
-
 
   orchestrator:
     image: orchestrator:latest

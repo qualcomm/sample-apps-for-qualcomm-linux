@@ -22,6 +22,7 @@ RUN apt-get update && \
         make \
         gcc \
         g++ \
+        wget \
         nlohmann-json3-dev && \
     apt-add-repository -y ppa:ubuntu-qcom-iot/qcom-ppa && \
     apt-get update && \
@@ -30,6 +31,13 @@ RUN apt-get update && \
         qcom-dspservices-headers-dev \
         qcom-fastrpc1 && \
     rm -rf /var/lib/apt/lists/*
+
+# Pre-download httplib header-only library from GitHub
+ARG HTTPLIB_VERSION=v0.15.3
+RUN mkdir -p /opt/headers/httplib && \
+    wget -q --tries=3 --timeout=30 \
+        "https://raw.githubusercontent.com/yhirose/cpp-httplib/${HTTPLIB_VERSION}/httplib.h" \
+        -O /opt/headers/httplib/httplib.h
 
 WORKDIR /app/core-services/text-to-speech/meloTTS
 
@@ -95,7 +103,7 @@ RUN mkdir -p /opt/hexagon-sdk/ipc/fastrpc/remote/ship/UbuntuARM_aarch64 && \
     cp /usr/include/rpcmem.h /opt/hexagon-sdk/ipc/fastrpc/rpcmem/inc/rpcmem.h && \
     cp /usr/include/AEEStdErr.h /opt/hexagon-sdk/incs/AEEStdErr.h && \
     ln -sf /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1.0.0 /opt/hexagon-sdk/ipc/fastrpc/remote/ship/UbuntuARM_aarch64/libcdsprpc.so
-
+#the last step is silently failing???
 RUN cmake -S /opt/melo-sdk/src/npu/rpc/tts_wrapper \
           -B /tmp/libtts-build \
           -DLINUX=1 \
@@ -105,6 +113,9 @@ RUN cmake -S /opt/melo-sdk/src/npu/rpc/tts_wrapper \
     cmake --build /tmp/libtts-build --parallel "$(nproc)" && \
     install -D /tmp/libtts-build/libtts.so /opt/melo-sdk/libs/npu/rpc_libraries/linux/aarch64/libtts.so
 
+RUN mkdir -p /app/core-services/text-to-speech/meloTTS/src/third_party && \
+    cp /opt/headers/httplib/httplib.h /app/core-services/text-to-speech/meloTTS/src/third_party/httplib.h
+
 RUN cmake -S /app/core-services/text-to-speech/meloTTS/src \
           -B /tmp/tts-service-build \
           -DCMAKE_BUILD_TYPE=Release \
@@ -113,15 +124,9 @@ RUN cmake -S /app/core-services/text-to-speech/meloTTS/src \
     install -D /tmp/tts-service-build/tts-service /usr/local/bin/tts-service && \
     strip --strip-unneeded /usr/local/bin/tts-service || true
 
-FROM ubuntu:24.04
+FROM ubuntu-runtime:24.04 AS runtime
 
 ENV DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl && \
-    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

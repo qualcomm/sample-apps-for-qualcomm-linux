@@ -47,8 +47,8 @@ Model bundle layout:
 Quick checks on target:
 
 ```bash
-test -d /opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
-test -d /opt/qairt/current/qairt_245_flat_libs
+test -d /opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075 && echo "Text-to-Text model directory OK"
+test -d /opt/qairt/current/qairt_245_flat_libs && echo "QAIRT flat libs OK"
 ```
 
 ## Build and Start Service
