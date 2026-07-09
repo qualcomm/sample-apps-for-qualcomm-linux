@@ -130,16 +130,26 @@ cd /opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 
 ### 2) Target preflight checks
 
+**Run these checks to verify your device is properly configured:**
+
 ```bash
 # Verify docker and python
 docker --version
-docker compose version
+docker compose version  # For QLI 1.x, use: docker-compose version
 python3 --version
+
+# Verify hardware access
 ls -l /dev/fastrpc-cdsp
 ls /etc/cdi/
 
-# Verify QAIRT flat libs 
+# Verify QAIRT installation
 ls -la /opt/qairt/current/qairt_245_flat_libs/ 2>/dev/null || echo "QAIRT flat libs not yet staged"
+
+# Verify .env file exists for QLI 1.x and ubuntu (created during device setup)
+test -f .env && echo ".env file present" || echo "WARNING: .env file missing - run DEVICE_SETUP.md steps"
+
+# Check available disk space (need 50GB+ free)
+df -h /opt | tail -1
 ```
 If any checks fail, please refer to [`DEVICE_SETUP.md`](docs/setup/DEVICE_SETUP.md) to fix device provisioning.
 
@@ -159,13 +169,18 @@ Prepare the model folders under `/opt/genai-studio-models/`. Refer to each servi
 
 Run this only if you are bringing up the full stack or any private STT or TTS service.
 
+**NOTE:** Skip if you only need Text-to-Text, Image-to-Text, or Text-to-Image services
+
+
 ```bash
 qpm-cli --login
 qpm-cli --install VoiceAI_ASR -v 2.5.0.0 --path /opt/qcom/qpm/VoiceAI_ASR/2.5.0.0 --silent
 qpm-cli --install VoiceAI_TTS -v 1.1.1.0 --path /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0 --silent
 
-TARGET_REPO=/path/to/genai-studio-on-target  # Replace with actual path to GenAI Studio repository on target device
+# Set target repository path (adjust for your setup)
+TARGET_REPO=/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 
+# Transfer SDKs to target device
 rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk/ \
   ubuntu@<target-host>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
 
@@ -192,8 +207,13 @@ test -d core-services/text-to-speech/meloTTS/melo_sdk && echo "melo_sdk present"
   test -f core-services/text-to-speech/meloTTS/1.1.1.0.zip && echo "melo_sdk 1.1.1.0.zip present"
 
 bash scripts/pull-ubuntu-arm64.sh
+
+# Build runtime base image
 DOCKER_BUILDKIT=1 docker build --progress=plain -f Dockerfile.runtime -t ubuntu-runtime:24.04 .
+
+# Build build-base image
 DOCKER_BUILDKIT=1 docker build --progress=plain -f Dockerfile.build-base -t genai-build-base:latest .
+
 ```
 
 ### 6) Service binary and payload requirements
@@ -226,11 +246,25 @@ Start the full stack:
 
 ```bash
 docker compose up -d
+
+# Verify services are running
+docker compose ps
 ```
+**NOTE**: For QLI 1.x id docker compose results in an error, run docker-compose instead of docker compose as follows:
+```bash
+docker-compose up -d
+
+# Verify services are running
+docker-compose ps
+```
+
 
 **NOTE**: Only text-to-text, text-to-speech, and image-to-text are currently supported on QLI 2.0. For QLI 2.0, run:
 ```bash
 docker compose up -d text-to-text text-to-speech image-to-text orchestrator --no-deps
+
+# Verify services are running
+docker compose ps
 ```
 
 Once all services are running, you can:

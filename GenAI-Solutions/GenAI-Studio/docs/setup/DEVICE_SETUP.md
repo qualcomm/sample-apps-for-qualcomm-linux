@@ -222,13 +222,6 @@ ls -ld /usr/lib/dsp /usr/lib/dsp/cdsp 2>/dev/null || true
 ls -l /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 2>/dev/null || true
 ```
 
-Optional compatibility alias for older loaders:
-
-```bash
-sudo ln -sfn /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 /usr/lib/dsp/fastrpc_shell_unsigned_3
-```
-
-
 ### 8) Final Readiness
 
 ```bash
@@ -247,7 +240,7 @@ Run this first to verify your target device is already provisioned. If all check
 
 ```bash
 docker --version
-docker compose version
+docker-compose version
 docker buildx version
 ls /etc/cdi/
 ls -l /dev/fastrpc-cdsp
@@ -370,12 +363,6 @@ cat .env
 ls -l "$HOST_RPC_LIB_DIR/libcdsprpc.so" "$HOST_RPC_LIB_DIR/libcdsprpc.so.1" "$HOST_RPC_LIB_DIR/libcdsprpc.so.1.0.0" "$HOST_RPC_LIB_DIR/libdmabufheap.so.0"
 ls -ld /usr/lib/dsp /usr/lib/dsp/cdsp 2>/dev/null || true
 ls -l /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 2>/dev/null || true
-```
-
-Optional compatibility alias for older loaders:
-
-```bash
-ln -sfn /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 /usr/lib/dsp/fastrpc_shell_unsigned_3
 ```
 
 ## 5) Final Readiness
