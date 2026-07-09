@@ -58,8 +58,8 @@ WORKDIR /app
 
 # Copy service source + direct runner source (kept under core-services/text-to-image).
 # Build context is repo root.
-COPY core-services/text-to-image/src/ ./core-services/text-to-image/src/
-COPY core-services/text-to-image/deps/cpp_sd21_qnn/main_direct_qnn.cpp ./core-services/text-to-image/deps/cpp_sd21_qnn/main_direct_qnn.cpp
+COPY src/ ./core-services/text-to-image/src/
+COPY deps/cpp_sd21_qnn/main_direct_qnn.cpp ./core-services/text-to-image/deps/cpp_sd21_qnn/main_direct_qnn.cpp
 
 # This service includes:
 #   #include "httplib/httplib.h"
@@ -103,7 +103,7 @@ ENV ADSP_LIBRARY_PATH=/opt/runtime;/usr/lib/rfsa/adsp;/usr/lib/dsp;/dsp;/usr/lib
 
 COPY --link --chmod=0755 --from=builder /tmp/image-generation-service /usr/bin/image-generation-service
 COPY --link --chmod=0755 --from=builder /tmp/sd21_qnn_cpp_direct /usr/bin/sd21_qnn_cpp_direct
-COPY --link --chmod=0755 core-services/text-to-image/run.sh /app/run.sh
+COPY --link --chmod=0755 run.sh /app/run.sh
 # Required by sd21_qnn_cpp_direct on target; without this, image generation
 # may fail at runtime with: "Failed to load system lib: libatomic.so.1".
 COPY --link --from=builder /usr/lib/aarch64-linux-gnu/libatomic.so.1 /usr/lib/aarch64-linux-gnu/libatomic.so.1
