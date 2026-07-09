@@ -93,16 +93,13 @@ Container Device Interface (CDI) allows Docker containers to access hardware acc
 sudo install -m 0755 -d /etc/docker
 printf '{\n  "features": {\n    "cdi": true\n  }\n}\n' | sudo tee /etc/docker/daemon.json >/dev/null
 
-TMP_DIR=$(mktemp -d)
-git clone --depth 1 https://github.com/quic/sample-apps-for-qualcomm-linux.git "$TMP_DIR/sample-apps"
 sudo install -d /etc/cdi
-sudo cp "$TMP_DIR/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/1.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json
+sudo cp "/opt/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/1.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
 ```
 
 **Finalize Setup**
 ```bash
 sudo chmod 644 /etc/cdi/docker-run-cdi-hw-acc.json
-rm -rf "$TMP_DIR"
 
 sudo systemctl restart docker
 grep -n 'qualcomm.com/device=cdi-hw-acc' /etc/cdi/docker-run-cdi-hw-acc.json
@@ -424,17 +421,12 @@ docker buildx version
 Container Device Interface (CDI) allows Docker containers to access hardware accelerators. This section enables CDI and installs the Qualcomm hardware acceleration specification.
 
 ```bash
-install -m 0755 -d /etc/docker
-printf '{\n  "features": {\n    "cdi": true\n  }\n}\n' |  tee /etc/docker/daemon.json >/dev/null
-TMP_DIR=$(mktemp -d)
-git clone --depth 1 https://github.com/quic/sample-apps-for-qualcomm-linux.git "$TMP_DIR/sample-apps"
 install -d /etc/cdi
-cp "$TMP_DIR/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json
+cp "opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
 ```
 **Finalize Setup**
 ```bash
 chmod 644 /etc/cdi/docker-run-cdi-hw-acc.json
-rm -rf "$TMP_DIR"
 
 systemctl restart docker
 grep -n 'qualcomm.com/device=cdi-hw-acc' /etc/cdi/docker-run-cdi-hw-acc.json

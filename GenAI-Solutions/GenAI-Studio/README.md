@@ -109,10 +109,26 @@ Each functional block (Speech-To-Text, Text-to-Text, Text-to-Image, Text-to-Spee
 - Minimum 16GB RAM, 50GB storage
 
 ## Quick Start
+
+### 1) Clone the repository
+
+Clone on the repository on the host machine and then transfer to the target device.
+
+```bash
+git clone https://github.com/qualcomm/sample-apps-for-qualcomm-linux.git
+
+# For ubuntu
+scp -r sample-apps-for-qualcomm-linux ubuntu@<target-host>:/opt #/opt is recommended
+
+# For QLI
+scp -r sample-apps-for-qualcomm-linux root@<target-host>:/opt #/opt is recommended
+
+cd /opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
+```
  
 ### For first time startup on a new device, please follow [`docs/setup/DEVICE_SETUP.md`](docs/setup/DEVICE_SETUP.md) before proceeding.
 
-### 1) Target preflight checks
+### 2) Target preflight checks
 
 ```bash
 # Verify docker and python
@@ -127,7 +143,7 @@ ls -la /opt/qairt/current/qairt_245_flat_libs/ 2>/dev/null || echo "QAIRT flat l
 ```
 If any checks fail, please refer to [`DEVICE_SETUP.md`](docs/setup/DEVICE_SETUP.md) to fix device provisioning.
 
-### 2) Target model preparation
+### 3) Target model preparation
 
 Prepare the model folders under `/opt/genai-studio-models/`. Refer to each service's model setup doc for acquisition details:
 
@@ -138,24 +154,6 @@ Prepare the model folders under `/opt/genai-studio-models/`. Refer to each servi
 | Text-To-Image | `/opt/genai-studio-models/text-to-image/stable_diffusion_v2_1-qnn_context_binary-w8a16-qualcomm_qcs9075` | [`core-services/text-to-image/MODEL_SETUP.md`](core-services/text-to-image/MODEL_SETUP.md) |
 | Speech-To-Text | `/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075` | [`core-services/speech-to-text/MODEL_SETUP.md`](core-services/speech-to-text/MODEL_SETUP.md) |
 | Text-To-Speech | `/opt/genai-studio-models/text-to-speech/melo-tts-v73/files` | [`core-services/text-to-speech/meloTTS/Model-Generation.md`](core-services/text-to-speech/meloTTS/Model-Generation.md) |
-
-### 3) Clone the repository
-
-Clone the repository to the appropriate location based on your target platform:
-- **Ubuntu and QLI 1.9**: Clone directly on the target device
-- **QLI 2.0**: Clone on the host machine, then transfer to the target device
-
-```bash
-# On target (Ubuntu/QLI 1.9)
-git clone https://github.com/qualcomm/sample-apps-for-qualcomm-linux.git
-cd sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
-
-# On host (QLI 2.0)
-git clone https://github.com/qualcomm/sample-apps-for-qualcomm-linux.git
-scp -r sample-apps-for-qualcomm-linux ubuntu@<target-host>:/opt #/opt is recommended
-# On target (QLI 2.0)
-cd /path/to/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
-```
 
 ### 4) Host-side private SDK preparation (optional)
 
