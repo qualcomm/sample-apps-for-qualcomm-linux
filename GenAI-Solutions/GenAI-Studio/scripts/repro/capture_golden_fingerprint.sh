@@ -1,5 +1,8 @@
 #!/bin/bash
 # ---------------------------------------------------------------------
+# Copyright (c) Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+# ---------------------------------------------------------------------
 # Capture a reproducible "golden environment fingerprint" snapshot.
 # ---------------------------------------------------------------------
 set -euo pipefail

@@ -14,7 +14,7 @@
 #   5. Build speech-to-text:latest via multi-stage Docker build
 #
 # Usage:
-#   WHISPER_SDK_ROOT=/opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk bash build.sh [--clean] [--no-cache]
+#   WHISPER_SDK_ROOT=/opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk bash build.sh [--clean] [--no-cache]
 #
 # Environment variables:
 #   WHISPER_SDK_ROOT   Path to the Whisper SDK root (required for step 3)
@@ -23,7 +23,7 @@
 #   STT_MODEL_DIR      Output model directory for AIHub downloads
 #
 # Example:
-#   WHISPER_SDK_ROOT=/opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk \
+#   WHISPER_SDK_ROOT=/opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk \
 #     bash build.sh
 # =============================================================================
 
@@ -158,7 +158,7 @@ else
     if [[ -z "${WHISPER_SDK_ROOT}" ]]; then
         echo "[build.sh] ERROR: WHISPER_SDK_ROOT is not set."
         echo "           Set it to the path of the Whisper SDK root directory."
-        echo "           Example: WHISPER_SDK_ROOT=/opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk"
+        echo "           Example: WHISPER_SDK_ROOT=/opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk"
         exit 1
     fi
 
@@ -169,10 +169,20 @@ else
 
     echo "      Creating minimal whisper_sdk/ slice from: ${WHISPER_SDK_ROOT}"
 
-    # Headers (for compilation)
-    mkdir -p "${WHISPER_SDK_DEST}/include/npu/rpc/linux"
-    cp -r "${WHISPER_SDK_ROOT}/include/npu/rpc/linux/." \
-          "${WHISPER_SDK_DEST}/include/npu/rpc/linux/"
+    # Headers (for compilation): support SDK 2.6+ and 2.5 layouts.
+    if [[ -d "${WHISPER_SDK_ROOT}/include/cpp" ]]; then
+        mkdir -p "${WHISPER_SDK_DEST}/include/cpp"
+        cp -r "${WHISPER_SDK_ROOT}/include/cpp/." \
+              "${WHISPER_SDK_DEST}/include/cpp/"
+    elif [[ -d "${WHISPER_SDK_ROOT}/include/npu/rpc/linux" ]]; then
+        mkdir -p "${WHISPER_SDK_DEST}/include/npu/rpc/linux"
+        cp -r "${WHISPER_SDK_ROOT}/include/npu/rpc/linux/." \
+              "${WHISPER_SDK_DEST}/include/npu/rpc/linux/"
+    else
+        echo "[build.sh] ERROR: Whisper headers not found under ${WHISPER_SDK_ROOT}/include"
+        echo "           Expected include/cpp (SDK 2.6+) or include/npu/rpc/linux (SDK 2.5)."
+        exit 1
+    fi
 
     # Linux runtime shared libraries
     LINUX_LIBS="${WHISPER_SDK_ROOT}/libs/npu/rpc_libraries/linux/whisper_all_quantized"

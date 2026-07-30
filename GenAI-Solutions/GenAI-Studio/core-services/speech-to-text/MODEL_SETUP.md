@@ -17,17 +17,17 @@ Execution boundary:
 ## 1) Host-side Whisper SDK install and target staging (run on host machine only)
 
 ```bash
-qpm-cli --install VoiceAI_ASR -v 2.5.0.0 --path /opt/qcom/qpm/VoiceAI_ASR/2.5.0.0 --silent
+qpm-cli --install VoiceAI_ASR -v 2.6.0.0 --path /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0 --silent
 
 TARGET_REPO=/path/to/genai-studio-on-target
-rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk/ \
+rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
   ubuntu@<target-host>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
 ```
 
 That install creates the source SDK root at:
 
 ```text
-/opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk
+/opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk
 ```
 
 If you do not want to stage the SDK into the repo checkout, copy it anywhere on
@@ -49,7 +49,7 @@ sha256sum whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075.zip
 
 ## 3) Whisper SDK requirement (build + VAD asset)
 
-Whisper SDK 2.5.0.0 is required because:
+Whisper SDK 2.6.0.0 is required because:
 
 1. `core-services/speech-to-text/build.sh` compiles against SDK headers and libs.
 2. `libnnvad_model.so` is sourced from SDK assets.
@@ -57,7 +57,7 @@ Whisper SDK 2.5.0.0 is required because:
 Typical SDK path:
 
 ```text
-/opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk
+/opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk
 ```
 
 ## 4) Copy required VAD asset (run on target device)
@@ -112,7 +112,7 @@ ${MODEL_ROOT}/
 Recommended: keep runtime QNN libraries in a dedicated directory and pass it through `STT_QNN_LIB_HOST_DIR`.
 
 ```bash
-export STT_QNN_LIB_HOST_DIR=/opt/qairt/current/qairt_245_flat_libs
+export STT_QNN_LIB_HOST_DIR=/opt/qairt/current/qairt_260_flat_libs
 ```
 
 Reference for preparing these libraries:

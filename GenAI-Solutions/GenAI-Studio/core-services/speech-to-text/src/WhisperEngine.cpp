@@ -57,18 +57,16 @@ public:
 
         if (is_final == "1") {
             accumulated_text_ += text;
-            done_ = true;
-            cv_.notify_all();
         }
         // Partial transcriptions are not accumulated; the final result
         // contains the complete text for that segment.
     }
 
-    // Called when VAD detects speech start (100) or speech end (101).
-    // On speech end we signal completion even if no final transcription
-    // has arrived yet (e.g. silence / no-speech audio).
+    // Called on VAD and lifecycle events.
+    // For file transcription, completing on EVENT_SPEECH_ENDED can truncate
+    // multi-segment audio; wait for EVENT_ON_FINISHED instead.
     void onEvent(int event) override {
-        if (event == EVENT_SPEECH_ENDED) {
+        if (event == EVENT_ON_FINISHED) {
             std::lock_guard<std::mutex> lock(mu_);
             if (!done_) {
                 done_ = true;
@@ -230,6 +228,19 @@ std::string normalizeDecodedText(std::string text) {
     }
     return cleaned.substr(start, end - start);
 }
+
+// SDK 2.6 exposes InputStream::writeFile(path), while 2.5 exposes write(path).
+template <typename T>
+auto writeAudioFile(T& stream, const std::string& wav_path, int)
+    -> decltype(stream.writeFile(wav_path), void()) {
+    (void)stream.writeFile(wav_path);
+}
+
+template <typename T>
+auto writeAudioFile(T& stream, const std::string& wav_path, long)
+    -> decltype(stream.write(wav_path), void()) {
+    stream.write(wav_path);
+}
 }  // namespace
 
 WhisperEngine::WhisperEngine(const std::string& model_path,
@@ -312,7 +323,9 @@ void WhisperEngine::initialize() {
     paths[WhisperFunction::Whisper::KEY_MODEL_FILE_DECODER] = decoder_path;
     paths[WhisperFunction::Whisper::KEY_VOCAB_FILE]         = vocab_path;
     paths[WhisperFunction::Whisper::KEY_PATH_VAD_MODEL]     = vad_model;
-    paths[WhisperFunction::Whisper::KEY_PATH_ADSP]          = model_path_;
+    // Populate both key variants for SDK compatibility (2.5 ADSP, 2.6 CDSP).
+    paths["key_path_adsp"]                                  = model_path_;
+    paths["key_path_cdsp"]                                  = model_path_;
 
     if (!whisper_.init(paths)) {
         throw std::runtime_error(
@@ -503,8 +516,7 @@ TranscriptionResult WhisperEngine::doTranscribe(
     // Feed audio data into the InputStream buffer
     const auto t_feed_begin = std::chrono::steady_clock::now();
     if (use_file) {
-        // write(const std::string&) reads the WAV file from disk
-        input_stream.write(wav_path);
+        writeAudioFile(input_stream, wav_path, 0);
     } else {
         // write(vector<uint8_t>, offset, length) feeds raw PCM bytes
         // The SDK expects 16 kHz, 16-bit, mono, little-endian PCM

@@ -94,7 +94,7 @@ sudo install -m 0755 -d /etc/docker
 printf '{\n  "features": {\n    "cdi": true\n  }\n}\n' | sudo tee /etc/docker/daemon.json >/dev/null
 
 sudo install -d /etc/cdi
-sudo cp "/opt/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/1.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
+sudo cp "/opt/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
 ```
 
 **Finalize Setup**
@@ -183,18 +183,9 @@ cp -a /opt/qairt/current/lib/hexagon-v73/unsigned/libsnpehtpv73.cat "${QAIRT_FLA
 Do not bulk-copy `hexagon-v73/unsigned/*.so*` into flat dir (can cause ASR ELF class failures).
 **Note**: For IQ8 (QCS8275) and Ventuno Q please use the appropriate htp version (v75).
 
-### 7) Verify Host RPC/DSP Paths
+### 7) Verify Host RPC Path 
 
 ```bash
-unset HOST_RPC_LIB_DIR
-for d in /usr/lib/aarch64-linux-gnu /usr/lib; do
-  if [ -f "$d/libcdsprpc.so.1" ] && [ -f "$d/libdmabufheap.so.0" ]; then
-    export HOST_RPC_LIB_DIR="$d"
-    break
-  fi
-done
-[ -n "$HOST_RPC_LIB_DIR" ] || { echo "ERROR: host RPC libs not found"; exit 1; }
-
 # Detect FASTRPC shell location
 unset FAST_RPC_SHELL_PATH
 
@@ -210,14 +201,10 @@ done
   exit 1
 }
 
-{
-  echo "HOST_RPC_LIB_DIR=$HOST_RPC_LIB_DIR"
-  echo "FAST_RPC_SHELL_PATH=$FAST_RPC_SHELL_PATH"
-} > .env
+echo "FAST_RPC_SHELL_PATH=$FAST_RPC_SHELL_PATH" > .env
 
 cat .env
 
-ls -l "$HOST_RPC_LIB_DIR/libcdsprpc.so" "$HOST_RPC_LIB_DIR/libcdsprpc.so.1" "$HOST_RPC_LIB_DIR/libcdsprpc.so.1.0.0" "$HOST_RPC_LIB_DIR/libdmabufheap.so.0"
 ls -ld /usr/lib/dsp /usr/lib/dsp/cdsp 2>/dev/null || true
 ls -l /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 2>/dev/null || true
 ```
@@ -229,7 +216,6 @@ docker --version
 docker compose version
 docker buildx version
 ls -ld /opt/genai-studio-models /opt/qairt /opt/qairt/current /opt/qairt/current/qairt_245_flat_libs
-echo "${HOST_RPC_LIB_DIR:-HOST_RPC_LIB_DIR not set in this shell}"
 ```
 
 ## QLI 1.x
@@ -326,18 +312,9 @@ cp -a /opt/qairt/current/lib/hexagon-v73/unsigned/libsnpehtpv73.cat "${QAIRT_FLA
 
 Do not bulk-copy `hexagon-v73/unsigned/*.so*` into flat dir (can cause ASR ELF class failures).
 
-### 4) Verify Host RPC/DSP Paths
+### 4) Verify Host RPC Path 
 
 ```bash
-unset HOST_RPC_LIB_DIR
-for d in /usr/lib/aarch64-linux-gnu /usr/lib; do
-  if [ -f "$d/libcdsprpc.so.1" ] && [ -f "$d/libdmabufheap.so.0" ]; then
-    export HOST_RPC_LIB_DIR="$d"
-    break
-  fi
-done
-[ -n "$HOST_RPC_LIB_DIR" ] || { echo "ERROR: host RPC libs not found"; exit 1; }
-
 # Detect FASTRPC shell location
 unset FAST_RPC_SHELL_PATH
 
@@ -353,14 +330,10 @@ done
   exit 1
 }
 
-{
-  echo "HOST_RPC_LIB_DIR=$HOST_RPC_LIB_DIR"
-  echo "FAST_RPC_SHELL_PATH=$FAST_RPC_SHELL_PATH"
-} > .env
+echo "FAST_RPC_SHELL_PATH=$FAST_RPC_SHELL_PATH" > .env
 
 cat .env
 
-ls -l "$HOST_RPC_LIB_DIR/libcdsprpc.so" "$HOST_RPC_LIB_DIR/libcdsprpc.so.1" "$HOST_RPC_LIB_DIR/libcdsprpc.so.1.0.0" "$HOST_RPC_LIB_DIR/libdmabufheap.so.0"
 ls -ld /usr/lib/dsp /usr/lib/dsp/cdsp 2>/dev/null || true
 ls -l /usr/lib/dsp/cdsp/fastrpc_shell_unsigned_3 2>/dev/null || true
 ```
@@ -372,7 +345,7 @@ docker --version
 docker compose version
 docker buildx version
 ls -ld /opt/genai-studio-models /opt/qairt /opt/qairt/current /opt/qairt/current/qairt_245_flat_libs
-echo "${HOST_RPC_LIB_DIR:-HOST_RPC_LIB_DIR not set in this shell}"
+echo "${FAST_RPC_SHELL_PATH:-  FAST_RPC_SHELL_PATH not set in this shell}"
 ```
 
 ## QLI 2.0
@@ -401,6 +374,8 @@ curl -L https://github.com/docker/buildx/releases/download/v0.14.1/buildx-v0.14.
   -o docker-buildx
 chmod +x docker-buildx
 docker buildx version
+
+cd -
 ```
 
 ### 1) Enable Docker CDI + Install Qualcomm CDI Spec
@@ -409,7 +384,7 @@ Container Device Interface (CDI) allows Docker containers to access hardware acc
 
 ```bash
 install -d /etc/cdi
-cp "opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
+cp "/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
 ```
 **Finalize Setup**
 ```bash

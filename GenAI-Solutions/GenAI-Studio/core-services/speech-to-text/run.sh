@@ -14,23 +14,48 @@
 set -euo pipefail
 
 MODEL_PATH="${MODEL_PATH:-/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075/}"
-QNN_LIB_DIR="${QNN_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}"
+QNN_LIB_DIR="${QNN_LIB_DIR:-/opt/qnn-host}"
 QNN_SKEL_PATH="${QNN_SKEL_PATH:-}"
 RUNTIME_LIB_DIR="${RUNTIME_LIB_DIR:-/tmp/asr-runtime-libs}"
 ASR_VAD_PATH="${ASR_VAD_PATH:-}"
 ASR_ASSETS_DIR="${ASR_ASSETS_DIR:-/opt/asr-assets}"
-QAIRT_VERSION_HINT="${QAIRT_VERSION_HINT:-runtime=2.45.0.260326}"
+FASTRPC_SHELL_PATH="${FASTRPC_SHELL_PATH:-}"
+QAIRT_VERSION_HINT="${QAIRT_VERSION_HINT:-runtime=2.6.x}"
 
 # Ensure model path has trailing slash for Whisper SDK path assembly.
 if [[ -n "${MODEL_PATH}" && "${MODEL_PATH}" != */ ]]; then
     MODEL_PATH="${MODEL_PATH}/"
 fi
 
-# Prepare writable runtime overlay for transient symlinks (do not mutate mounted model dir).
+# Prefer externally mounted flat libs when valid; otherwise use bundled SDK QNN libs.
+if [[ ! -f "${QNN_LIB_DIR}/libQnnHtp.so" || ! -f "${QNN_LIB_DIR}/libQnnSystem.so" ]]; then
+    if [[ -f /opt/asr-qnn/libQnnHtp.so && -f /opt/asr-qnn/libQnnSystem.so ]]; then
+        echo "[run.sh] QNN libs not usable at ${QNN_LIB_DIR}; falling back to /opt/asr-qnn"
+        QNN_LIB_DIR="/opt/asr-qnn"
+    fi
+fi
+
+# Prepare writable runtime overlay for transient symlinks/files.
 mkdir -p "${RUNTIME_LIB_DIR}"
 
+# If provided in image/host, stage fastrpc shell into runtime overlay.
+# This avoids relying on writable /usr mount points inside container.
+SHELL_SOURCE=""
+if [[ -n "${FASTRPC_SHELL_PATH}" && -f "${FASTRPC_SHELL_PATH}" ]]; then
+    SHELL_SOURCE="${FASTRPC_SHELL_PATH}"
+elif [[ -f "${QNN_LIB_DIR}/fastrpc_shell_unsigned_3" ]]; then
+    SHELL_SOURCE="${QNN_LIB_DIR}/fastrpc_shell_unsigned_3"
+elif [[ -f /usr/lib/dsp/fastrpc_shell_unsigned_3 ]]; then
+    SHELL_SOURCE="/usr/lib/dsp/fastrpc_shell_unsigned_3"
+else
+    SHELL_SOURCE="$(find /usr/share/qcom -type f -name fastrpc_shell_unsigned_3 2>/dev/null | head -n1 || true)"
+fi
+
+if [[ -n "${SHELL_SOURCE}" && -f "${SHELL_SOURCE}" ]]; then
+    cp -f "${SHELL_SOURCE}" "${RUNTIME_LIB_DIR}/fastrpc_shell_unsigned_3" || true
+fi
+
 # FastRPC ADSP search path is semicolon-separated in Qualcomm runtime.
-# Keep QNN runtime directory first so an older skel in model dir does not take precedence.
 export ADSP_LIBRARY_PATH="${RUNTIME_LIB_DIR};${QNN_LIB_DIR};${MODEL_PATH};/usr/lib/rfsa/adsp;/usr/lib/dsp;/dsp;/usr/lib/dsp/cdsp1${ADSP_LIBRARY_PATH:+;${ADSP_LIBRARY_PATH}}"
 
 # Build LD path with runtime overlay first, then QNN libs, model dir, and system libs.
@@ -45,6 +70,9 @@ echo " QAIRT hint : ${QAIRT_VERSION_HINT}"
 echo " Runtime dir: ${RUNTIME_LIB_DIR}"
 if [[ -n "${QNN_SKEL_PATH}" ]]; then
     echo " QNN skel   : ${QNN_SKEL_PATH}"
+fi
+if [[ -n "${SHELL_SOURCE}" ]]; then
+    echo " FastRPC sh : ${SHELL_SOURCE}"
 fi
 echo " Assets dir : ${ASR_ASSETS_DIR}"
 echo " Port       : 8081"
@@ -61,6 +89,9 @@ for req in \
     fi
 done
 
+# Optional debug: print embedded build-id markers when available.
+strings "${QNN_LIB_DIR}/libQnnHtp.so" 2>/dev/null | grep -m1 -E v2.[0-9]+ || true
+
 if [[ ! -e /opt/host-libs/libcdsprpc.so.1 && \
       ! -e /opt/host-libs/libcdsprpc.so && \
       ! -e /opt/host-libs/libcdsprpc.so.1.0.0 && \
@@ -71,7 +102,6 @@ if [[ ! -e /opt/host-libs/libcdsprpc.so.1 && \
       ! -e /usr/lib/aarch64-linux-gnu/libcdsprpc.so && \
       ! -e /usr/lib/aarch64-linux-gnu/libcdsprpc.so.1.0.0 ]]; then
     echo "[run.sh] ERROR: libcdsprpc not found in /opt/host-libs or system lib paths."
-    echo "[run.sh] Check HOST_RPC_LIB_DIR in docker-compose/.env."
     exit 1
 fi
 
@@ -143,15 +173,29 @@ if [[ -n "${SKEL_SOURCE}" ]]; then
     ln -sf "${RUNTIME_LIB_DIR}/libQnnHtpV73Skel.so" "${RUNTIME_LIB_DIR}/libQnnHtpV73Skel.so.2" || true
 fi
 
+# Whisper SDK device init uses key_path_adsp/key_path_cdsp and expects the
+# skel plus model artifacts to be reachable from that path. The mounted model
+# directory is read-only, so we stage a writable overlay and launch from there.
+LAUNCH_MODEL_PATH="${MODEL_PATH}"
+if [[ -f "${RUNTIME_LIB_DIR}/libQnnHtpV73Skel.so" ]]; then
+    ln -sf "${ENCODER_FILE}" "${RUNTIME_LIB_DIR}/encoder.bin" || true
+    ln -sf "${DECODER_FILE}" "${RUNTIME_LIB_DIR}/decoder.bin" || true
+    ln -sf "${VOCAB_FILE}" "${RUNTIME_LIB_DIR}/vocab.bin" || true
+    ln -sf "${ASR_VAD_PATH}" "${RUNTIME_LIB_DIR}/libnnvad_model.so" || true
+    LAUNCH_MODEL_PATH="${RUNTIME_LIB_DIR}/"
+fi
+
 export ASR_VAD_PATH
 
 echo "[run.sh] Encoder file : ${ENCODER_FILE}"
 echo "[run.sh] Decoder file : ${DECODER_FILE}"
 echo "[run.sh] Vocab file   : ${VOCAB_FILE}"
 echo "[run.sh] VAD file     : ${ASR_VAD_PATH}"
+echo "[run.sh] Launch model : ${LAUNCH_MODEL_PATH}"
 echo "[run.sh] Model files found. Starting asr-service..."
 
 exec asr-service \
-    --model-path "${MODEL_PATH}" \
+    --model-path "${LAUNCH_MODEL_PATH}" \
     --vad-model-path "${ASR_VAD_PATH}" \
-    --port 8081
+    --port 8081 \
+#    2> >(grep -vE "^\[[0-9:.]+\]\[I\]\[whisper_function\]\[[0-9]+/[0-9]+\] \[WhisperFunction\]:" >&2)
