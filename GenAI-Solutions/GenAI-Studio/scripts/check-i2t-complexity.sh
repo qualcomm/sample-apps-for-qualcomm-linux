@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# ---------------------------------------------------------------------
+# Copyright (c) Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+# ---------------------------------------------------------------------
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

@@ -12,14 +12,15 @@ Canonical build/run/rebuild commands live in repo-root `README.md`:
 ## Prerequisites
 
 - model bundle under `/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075`
-- QAIRT flat runtime libs under `/opt/qairt/current/qairt_245_flat_libs`
+- QAIRT flat runtime libs under `/opt/qairt/current/qairt_260_flat_libs`
+  (override with `STT_QNN_LIB_HOST_DIR` if your layout/version differs)
 
 Quick checks on target:
 
 ```bash
 test -d core-services/speech-to-text/whisper_sdk && echo "whisper_sdk present"
 test -d /opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075 && echo "Speech-to-Text model directory OK"
-test -d /opt/qairt/current/qairt_245_flat_libs && echo "QAIRT flat libs OK"
+test -d /opt/qairt/current/qairt_260_flat_libs && echo "QAIRT flat libs OK"
 ```
 ## Build and Start Service
 
@@ -32,7 +33,7 @@ DOCKER_BUILDKIT=1 docker build --progress=plain -t speech-to-text:latest core-se
 Export required environment variables and start the container:
 
 ```bash
-export STT_QNN_LIB_HOST_DIR=/opt/qairt/current/qairt_245_flat_libs
+export STT_QNN_LIB_HOST_DIR=/opt/qairt/current/qairt_260_flat_libs
 export STT_MODEL_HOST_DIR=/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075
 
 docker compose up -d speech-to-text
@@ -115,7 +116,8 @@ python3 tests/unified/run_http_suite.py \
 - `whisper_sdk/` missing at build time:
   - stage SDK from host into `core-services/speech-to-text/whisper_sdk`
 - `libQnn*` not found at runtime:
-  - set `STT_QNN_LIB_HOST_DIR=/opt/qairt/current/qairt_245_flat_libs`
+  - set `STT_QNN_LIB_HOST_DIR` to your device runtime flat-lib directory
+    (example: `/opt/qairt/current/qairt_260_flat_libs`)
 - `429 rate_limited`:
   - reduce concurrent requests and retry with backoff
 - orchestrator route fails but backend is healthy:

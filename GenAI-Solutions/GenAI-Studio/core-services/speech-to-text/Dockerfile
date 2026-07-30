@@ -62,8 +62,13 @@ RUN rm -rf ./src/build && \
 # ═══════════════════════════════════════════════════════════════════════════════
 FROM ubuntu-runtime:24.04
 
-# Whisper .so libs are in /usr/lib; QNN libs injected via CDI device
-ENV LD_LIBRARY_PATH=/usr/lib
+# Whisper runtime libs are in /usr/lib; bundled QNN runtime libs live in /opt/asr-qnn
+ENV LD_LIBRARY_PATH=/opt/asr-qnn:/usr/lib
+
+# Audio decode/normalize fallback for compressed uploads (mp3/m4a/ogg/flac/...).
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy compiled asr-service binary
 COPY --link --chmod=0755 --from=builder /app/core-services/speech-to-text/src/build/asr-service /usr/bin/asr-service
@@ -72,6 +77,12 @@ COPY --link --chmod=0755 --from=builder /app/core-services/speech-to-text/src/bu
 COPY --link --from=builder \
     /app/core-services/speech-to-text/whisper_sdk/libs/npu/rpc_libraries/linux/whisper_all_quantized/ \
     /usr/lib/
+
+# Bundle QNN runtime libs shipped with the Whisper SDK Linux sample.
+# This avoids requiring host /usr mounts for STT runtime bring-up.
+COPY --link --from=builder \
+    /app/core-services/speech-to-text/whisper_sdk/sampleapp/npu_rpc_linux_sample/voice-ai-ref/libs/arm64-v8a/libQnn*.so \
+    /opt/asr-qnn/
 
 # Copy Whisper VAD assets into the image so AIHub-only model directories
 # (encoder/decoder/vocab) can still run without manual VAD file copy.
@@ -86,8 +97,9 @@ COPY --link --chmod=0755 run.sh /app/run.sh
 EXPOSE 8081
 
 # ─── Runtime volume mounts (provided by docker run / docker compose) ──────────
-# -v /path/to/whisper/models:/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075/
-#     Provides: encoder_model_htp.bin, decoder_model_htp.bin, vocab.bin
+# -v /path/to/whisper/models:/opt/ASR_binary/Whisper/
+#     Provides: encoder.bin, decoder.bin, vocab.bin
 #     Optional: libnnvad_model.so (fallback copy is embedded in image)
-# --device qualcomm.com/device=cdi-hw-acc → QNN libs + /dev/fastrpc-cdsp
+# -v /path/to/qnn/flat-libs:/opt/qnn-host  (optional override)
+# --device qualcomm.com/device=cdi-hw-acc → FastRPC device access
 CMD ["./run.sh"]

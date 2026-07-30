@@ -44,8 +44,15 @@ set(WHISPER_SDK_ROOT
     "${CMAKE_CURRENT_SOURCE_DIR}/../../whisper_sdk"
     CACHE PATH "Path to the Whisper SDK root (contains include/ and libs/)")
 
-set(WHISPER_INCLUDE_DIR
-    "${WHISPER_SDK_ROOT}/include/npu/rpc/linux")
+if(EXISTS "${WHISPER_SDK_ROOT}/include/cpp/Whisper.h")
+    set(WHISPER_INCLUDE_DIR "${WHISPER_SDK_ROOT}/include/cpp")
+elseif(EXISTS "${WHISPER_SDK_ROOT}/include/npu/rpc/linux/Whisper.h")
+    set(WHISPER_INCLUDE_DIR "${WHISPER_SDK_ROOT}/include/npu/rpc/linux")
+else()
+    message(FATAL_ERROR
+        "Could not find Whisper headers under ${WHISPER_SDK_ROOT}. "
+        "Expected include/cpp/Whisper.h (SDK 2.6+) or include/npu/rpc/linux/Whisper.h (SDK 2.5).")
+endif()
 
 set(WHISPER_LIB_DIR
     "${WHISPER_SDK_ROOT}/libs/npu/rpc_libraries/linux/whisper_all_quantized")

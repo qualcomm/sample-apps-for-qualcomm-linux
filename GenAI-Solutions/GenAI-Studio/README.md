@@ -174,14 +174,14 @@ Run this only if you are bringing up the full stack or any private STT or TTS se
 
 ```bash
 qpm-cli --login
-qpm-cli --install VoiceAI_ASR -v 2.5.0.0 --path /opt/qcom/qpm/VoiceAI_ASR/2.5.0.0 --silent
+qpm-cli --install VoiceAI_ASR -v 2.6.0.0 --path /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0 --silent
 qpm-cli --install VoiceAI_TTS -v 1.1.1.0 --path /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0 --silent
 
 # Set target repository path (adjust for your setup)
 TARGET_REPO=/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 
 # Transfer SDKs to target device
-rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.5.0.0/whisper_sdk/ \
+rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
   ubuntu@<target-host>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
 
 rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/melo_sdk/ \
@@ -250,21 +250,12 @@ docker compose up -d
 # Verify services are running
 docker compose ps
 ```
-**NOTE**: For QLI 1.x id docker compose results in an error, run docker-compose instead of docker compose as follows:
+**NOTE**: For QLI 1.x if docker compose results in an error, run docker-compose instead of docker compose as follows:
 ```bash
 docker-compose up -d
 
 # Verify services are running
 docker-compose ps
-```
-
-
-**NOTE**: Only text-to-text, text-to-speech, and image-to-text are currently supported on QLI 2.0. For QLI 2.0, run:
-```bash
-docker compose up -d text-to-text text-to-speech image-to-text orchestrator --no-deps
-
-# Verify services are running
-docker compose ps
 ```
 
 Once all services are running, you can:
