@@ -58,7 +58,7 @@ if args.output == "file":
 else:
     Gst.init(None)
     pipeline = Gst.parse_launch(
-        'appsrc name=src is-live=true block=true format=time caps=video/x-raw,format=BGR,width=1080,height=720,framerate=30/1 ! videoconvert ! waylandsink sync=false'
+        'appsrc name=src is-live=true block=true format=time caps=video/x-raw,format=BGR,width=1080,height=720,framerate=30/1 ! videoconvert ! waylandsink sync=true'
     )
     appsrc = pipeline.get_by_name('src')
     pipeline.set_state(Gst.State.PLAYING)
