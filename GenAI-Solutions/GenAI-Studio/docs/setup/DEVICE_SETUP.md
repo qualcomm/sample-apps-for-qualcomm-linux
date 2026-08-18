@@ -1,10 +1,26 @@
 # Device Setup (Qualcomm Ubuntu 24.04 / QLI 1.x / QLI 2.0)
 
-This file is intended for initial target device provisioning only.
+> This document is intended for **initial target device provisioning only**.
 
-All commands below should be run on the **TARGET device**.
+Ensure that all commands in this guide are executed on the **target device** that is being provisioned.
 
-Please follow the steps for your specifc OS
+---
+
+For a complete automated setup, run the following provisioning script:
+
+```bash
+bash scripts/phases/device-setup.sh
+```
+#### NOTE: Run with sudo on ubuntu.
+
+For startup script flags, phase behavior, and customization options, see
+[`../STARTUP_SCRIPT_GUIDE.md`](../STARTUP_SCRIPT_GUIDE.md).
+
+---
+
+For manual device setup or any debug follow the following steps.
+
+Please follow the steps for your specific OS
 
 - [Ubuntu](#ubuntu-24.04)
 - [QLI 1.x](#qli-1x)
@@ -94,7 +110,11 @@ sudo install -m 0755 -d /etc/docker
 printf '{\n  "features": {\n    "cdi": true\n  }\n}\n' | sudo tee /etc/docker/daemon.json >/dev/null
 
 sudo install -d /etc/cdi
+<<<<<<< HEAD
 sudo cp "/opt/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
+=======
+sudo cp "/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
+>>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 ```
 
 **Finalize Setup**
@@ -149,9 +169,9 @@ TMP_UNZIP=$(mktemp -d)
 unzip -q "$QAIRT_ZIP" -d "$TMP_UNZIP"
 sudo mkdir -p "/opt/qairt/${QAIRT_VER}"
 if [ -d "$TMP_UNZIP/qairt/${QAIRT_VER}" ]; then
-  rsync -a "$TMP_UNZIP/qairt/${QAIRT_VER}/" "/opt/qairt/${QAIRT_VER}/"
+  sudo rsync -a "$TMP_UNZIP/qairt/${QAIRT_VER}/" "/opt/qairt/${QAIRT_VER}/"
 else
-  rsync -a "$TMP_UNZIP/" "/opt/qairt/${QAIRT_VER}/"
+  sudo rsync -a "$TMP_UNZIP/" "/opt/qairt/${QAIRT_VER}/"
 fi
 rm -rf "$TMP_UNZIP"
 sudo ln -sfn "/opt/qairt/${QAIRT_VER}" /opt/qairt/current

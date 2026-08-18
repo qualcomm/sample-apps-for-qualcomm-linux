@@ -33,7 +33,7 @@ To avoid model routing ambiguity:
 Environment knobs:
 
 - `TG_ORCHESTRATOR_MODEL_ID` (default `genie`)
-- `TG_DIRECT_MODEL_ID` (default `llama3.2-3B`)
+- `TG_DIRECT_MODEL_ID` (default `qwen3-4B`)
 
 ## 3) `/v1/chat/completions` Routing Policy
 

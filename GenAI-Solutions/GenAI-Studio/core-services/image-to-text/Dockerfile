@@ -90,9 +90,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /root/.cache/pip
 
 # Model dir provides libGenie.so, libQnnHtp.so, libQnnSystem.so at runtime
-ENV MODEL_DIR=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
-ENV LD_LIBRARY_PATH=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files:/usr/lib
-ENV ADSP_LIBRARY_PATH=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files:/usr/lib:/dsp
+ENV MODEL_DIR=/opt/I2T_binary/files
+ENV LD_LIBRARY_PATH=/opt/I2T_binary/files:/usr/lib
+ENV ADSP_LIBRARY_PATH=/opt/I2T_binary/files:/usr/lib:/dsp
 ENV PATH=/opt/i2t-venv/bin:${PATH}
 ENV I2T_PREPROCESS_PYTHON=/opt/i2t-venv/bin/python
 ENV I2T_PREPROCESS_SCRIPT=/opt/i2t/preprocess.py
@@ -108,7 +108,7 @@ COPY --link --chmod=0755 run.sh /app/run.sh
 EXPOSE 8080
 
 # ─── Runtime volume mounts (provided by docker run / docker compose) ──────────
-# -v /opt/genai-studio-models/image-to-text/.../files:/opt/genai-studio-models/image-to-text/.../files
+# -v /opt/genai-studio-models/image-to-text/.../files:/opt/I2T_binary/files
 #     Provides: libGenie.so, libQnnHtp.so, libQnnSystem.so, model files
 # --device qualcomm.com/device=cdi-hw-acc → /dev/fastrpc-cdsp + QNN runtime libs
 CMD ["./run.sh"]

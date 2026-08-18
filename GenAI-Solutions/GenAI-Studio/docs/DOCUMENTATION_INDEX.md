@@ -11,6 +11,7 @@ This document serves as the authoritative reference for repository structure, do
 | Your Task | Refer |
 |---|---|
 | **Full-stack bring-up** | [README.md](../README.md) |
+| **Startup script flags and customization** | [docs/STARTUP_SCRIPT_GUIDE.md](STARTUP_SCRIPT_GUIDE.md) |
 | **First-time target provisioning** | [docs/setup/DEVICE_SETUP.md](setup/DEVICE_SETUP.md) |
 | **Troubleshooting runtime errors** | [docs/TROUBLESHOOTING_GUIDE.md](TROUBLESHOOTING_GUIDE.md) |
 | **Service map, ports, and pointers to individual service docs** | [core-services/README.md](../core-services/README.md) |
@@ -37,6 +38,7 @@ This document serves as the authoritative reference for repository structure, do
 | [core-services/text-to-speech/meloTTS/Model-Generation.md](../core-services/text-to-speech/meloTTS/Model-Generation.md) | TTS model selection, download, and runtime configuration |
 | [core-services/orchestrator/README.md](../core-services/orchestrator/README.md) | Unified API routes (`:8090`) and upstream service routing behavior |
 | [docs/setup/DEVICE_SETUP.md](setup/DEVICE_SETUP.md) | Device provisioning and low-level platform checks |
+| [docs/STARTUP_SCRIPT_GUIDE.md](STARTUP_SCRIPT_GUIDE.md) | Startup automation reference for `scripts/genai-studio.sh` and phase scripts (flags, customization, workflows) |
 | [docs/TROUBLESHOOTING_GUIDE.md](TROUBLESHOOTING_GUIDE.md) | Complete troubleshooting reference: error signatures, 5-step playbook, service pain points, and triage paths |
 | [tests/README.md](../tests/README.md) | Test folder organization and where suites live |
 | [tests/unified/README.md](../tests/unified/README.md) | Unified service-by-service and full-stack test execution |

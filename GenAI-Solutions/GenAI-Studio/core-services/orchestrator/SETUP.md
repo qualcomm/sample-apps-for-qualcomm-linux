@@ -10,7 +10,7 @@ It routes to backend services and needs these mounted dependencies:
 
 - backend services up on ports `8088`, `8081`, `8083`, `8084`, `8080`
 - I2T model mount path for preprocess outputs:
-  - `/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files`
+  - `/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075`
 - Hugging Face processor cache for Qwen2.5-VL preprocess:
   - `${HF_CACHE_HOST_DIR:-/opt/genai-studio-cache/huggingface}:/root/.cache/huggingface`
 

@@ -2,7 +2,10 @@
 // Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause
 // =============================================================================
+<<<<<<< HEAD
 
+=======
+>>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 #pragma once
 #include <filesystem>
 #include <mutex>
@@ -63,6 +66,7 @@ private:
 
 private:
     fs::path baseDir_;
+    fs::path inputsDir_;
 
     GeniePipelineRunner pipeline_;
     ImageEncoderNode imageEnc_;

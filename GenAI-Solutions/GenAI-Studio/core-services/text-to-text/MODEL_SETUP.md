@@ -9,6 +9,20 @@ For full stack bring-up, follow repo-root [README.md](../../README.md) first.
 2. [README.md](README.md) in this folder
 3. This file for model payload checks
 
+## Scripted setup (recommended)
+
+Run on target device from repo root:
+
+```bash
+bash scripts/phases/model_gen.sh --service t2t
+```
+
+Force refresh:
+
+```bash
+bash scripts/phases/model_gen.sh --service t2t --force-download
+```
+
 ## Canonical Layout
 
 Use a flat model directory layout for all T2T models (usually aihub default).

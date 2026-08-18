@@ -42,7 +42,7 @@ This repository provides a complete GenAI Studio implementation with six indepen
 
 | Use Case | Description | Model(s) |
 |---|---|---|
-| **Text-to-Text** | Generates human-like responses with LLM for input prompts. Useful for creating articles, summaries, reports, or creative content automatically. | **LLaMA 3.2-3B**, **Qwen 3-4B** |
+| **Text-to-Text** | Generates human-like responses with LLM for input prompts. Useful for creating articles, summaries, reports, or creative content automatically. | **Qwen 3-4B (default)**, **LLaMA 3.2-3B (alternative)** |
 | **Text-to-Speech** | Transforms text into clear, natural-sounding audio. Ideal for voice assistants, audiobooks, and accessibility solutions. | **Melo-TTS** |
 | **Text-to-Image** | Generates images from text descriptions. Ideal for creating graphics, illustrations, or visual content without manual design. | **Stable Diffusion 2.1** |
 | **Speech-to-Text** | Turns spoken words into written text. Helpful for transcription, voice commands, and hands-free applications. | **Whisper Base** |
@@ -122,6 +122,93 @@ scp -r sample-apps-for-qualcomm-linux ubuntu@<target-host>:/opt #/opt is recomme
 
 # For QLI
 scp -r sample-apps-for-qualcomm-linux root@<target-host>:/opt #/opt is recommended
+<<<<<<< HEAD
+=======
+```
+ 
+### 2) Host-side private SDK preparation
+
+Run this if you are bringing up the full stack or any private STT or TTS service.
+
+**NOTE:** Skip if you only need Text-to-Text, Image-to-Text, or Text-to-Image services
+
+
+```bash
+qpm-cli --login
+qpm-cli --install VoiceAI_ASR -v 2.6.0.0 --path /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0 --silent
+qpm-cli --install VoiceAI_TTS -v 1.1.1.0 --path /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0 --silent
+
+# Set target repository path (adjust for your setup)
+TARGET_REPO=/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
+
+
+# Transfer SDKs to target device
+# For ubuntu target:
+rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
+  ubuntu@<target-ip>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
+
+rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/melo_sdk/ \
+  ubuntu@<target-ip>:${TARGET_REPO}/core-services/text-to-speech/meloTTS/melo_sdk/
+
+ssh ubuntu@<target-ip> "mkdir -p ${TARGET_REPO}/tools/model_conversion_scripts"
+
+rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/notebook/melo/npu/model_conversion_scripts/ \
+  ubuntu@<target-ip>:${TARGET_REPO}/tools/model_conversion_scripts/
+
+# For QLI target:
+rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
+  root@<target-ip>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
+
+rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/melo_sdk/ \
+  root@<target-ip>:${TARGET_REPO}/core-services/text-to-speech/meloTTS/melo_sdk/
+
+ssh root@<target-ip> "mkdir -p ${TARGET_REPO}/tools/model_conversion_scripts"
+
+rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/notebook/melo/npu/model_conversion_scripts/ \
+  root@<target-ip>:${TARGET_REPO}/tools/model_conversion_scripts/
+```
+
+**Notes:**
+- QPM install flow is host-side only. Do not run QPM install on target.
+- `VoiceAI_ASR` must be staged to `core-services/speech-to-text/whisper_sdk`.
+- `VoiceAI_TTS` must be staged to `core-services/text-to-speech/meloTTS/melo_sdk` (or use `1.1.1.0.zip` fallback in the same folder).
+
+### 3) Run the startup script
+
+On the target device, 
+
+```bash
+cd /opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio # adjust according to repo location on device
+
+# For ubuntu run
+sudo bash scripts/genai-studio.sh
+
+# For QLI run
+bash scripts/genai-studio.sh # we already run as root in QLI
+```
+For startup script flags, phase behavior, and customization options, see [`docs/STARTUP_SCRIPT_GUIDE.md`](docs/STARTUP_SCRIPT_GUIDE.md).
+By default, this script brings up the entire stack.
+
+Once all services are running, you can:
+- **Access via Orchestrator** – The web UI is accessible at **`http://<device-ip>:8090`** on your host machine.
+- **Integrate with OpenAI-compatible clients** – Use the service endpoints directly in any OpenAI-compatible application (see integration examples in [`solutions/README.md`](solutions/README.md))
+- **Run validation tests** – Proceed to the [Validation and Testing](#validation-and-testing) section to verify all services are functioning correctly
+
+## Manual bring-up
+You can also bring up the docker containers manually for more customizability 
+### 1) Clone the repository
+
+Clone on the repository on the host machine and then transfer to the target device.
+
+```bash
+git clone https://github.com/qualcomm/sample-apps-for-qualcomm-linux.git
+
+# For ubuntu
+scp -r sample-apps-for-qualcomm-linux ubuntu@<target-host>:/opt #/opt is recommended
+
+# For QLI
+scp -r sample-apps-for-qualcomm-linux root@<target-host>:/opt #/opt is recommended
+>>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 
 cd /opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 ```
@@ -160,7 +247,7 @@ Prepare the model folders under `/opt/genai-studio-models/`. Refer to each servi
 | Service | Target Path | Setup Doc |
 |---|---|---|
 | Text-To-Text | `/opt/genai-studio-models/text-to-text/...` | [`core-services/text-to-text/MODEL_SETUP.md`](core-services/text-to-text/MODEL_SETUP.md) |
-| Image-To-Text | `/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files` | [`core-services/image-to-text/MODEL_SETUP.md`](core-services/image-to-text/MODEL_SETUP.md) |
+| Image-To-Text | `/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075` | [`core-services/image-to-text/MODEL_SETUP.md`](core-services/image-to-text/MODEL_SETUP.md) |
 | Text-To-Image | `/opt/genai-studio-models/text-to-image/stable_diffusion_v2_1-qnn_context_binary-w8a16-qualcomm_qcs9075` | [`core-services/text-to-image/MODEL_SETUP.md`](core-services/text-to-image/MODEL_SETUP.md) |
 | Speech-To-Text | `/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075` | [`core-services/speech-to-text/MODEL_SETUP.md`](core-services/speech-to-text/MODEL_SETUP.md) |
 | Text-To-Speech | `/opt/genai-studio-models/text-to-speech/melo-tts-v73/files` | [`core-services/text-to-speech/meloTTS/Model-Generation.md`](core-services/text-to-speech/meloTTS/Model-Generation.md) |
@@ -181,11 +268,30 @@ qpm-cli --install VoiceAI_TTS -v 1.1.1.0 --path /opt/qcom/qpm/VoiceAI_TTS/1.1.1.
 TARGET_REPO=/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 
 # Transfer SDKs to target device
+<<<<<<< HEAD
 rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
   ubuntu@<target-host>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
+=======
+# For ubuntu target:
+rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
+  ubuntu@<target-ip>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
+>>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 
 rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/melo_sdk/ \
-  ubuntu@<target-host>:${TARGET_REPO}/core-services/text-to-speech/meloTTS/melo_sdk/
+  ubuntu@<target-ip>:${TARGET_REPO}/core-services/text-to-speech/meloTTS/melo_sdk/
+
+rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/notebook/melo/npu/model_conversion_scripts/ \
+  ubuntu@<target-ip>:${TARGET_REPO}/tools/model_conversion_scripts/
+
+# For QLI target:
+rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
+  root@<target-ip>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
+
+rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/melo_sdk/ \
+  root@<target-ip>:${TARGET_REPO}/core-services/text-to-speech/meloTTS/melo_sdk/
+
+rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/notebook/melo/npu/model_conversion_scripts/ \
+  root@<target-ip>:${TARGET_REPO}/tools/model_conversion_scripts/
 ```
 
 **Notes:**
@@ -223,7 +329,7 @@ Ensure all required files are in place before building service images:
 | Service | Required files/folders | Mount point |
 |---|---|---|
 | text-to-text | `/opt/genai-studio-models/text-to-text/<model>/genie_config.json` + model bundle | `TG_MODEL_HOST_DIR` |
-| image-to-text | `/opt/genai-studio-models/image-to-text/.../files` with `libGenie.so` and model assets | `I2T_MODEL_HOST_DIR` |
+| image-to-text | `/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075` with `libGenie.so` and model assets | `I2T_MODEL_HOST_DIR` |
 | text-to-image | SD2.1 context bins, tokenizer files, QAIRT libs | `IMAGEGEN_MODEL_DIR`, `IMG_QAIRT_LIBS_HOST_DIR` |
 | speech-to-text | `core-services/speech-to-text/whisper_sdk` (build-time), runtime model with `encoder.bin`, `decoder.bin`, `vocab.bin`, VAD model | `STT_MODEL_HOST_DIR`, `STT_QNN_LIB_HOST_DIR` |
 | text-to-speech | `core-services/text-to-speech/meloTTS/melo_sdk` or `1.1.1.0.zip` (build-time), runtime model with `.qnn` + `libtts_impl_skel.so` | `TTS_MODEL_HOST_DIR` |
@@ -276,7 +382,7 @@ export TTS_QAIRT_FLAT_LIB_DIR=/opt/qairt/current/qairt_245_flat_libs
 export TG_MODEL_DIR=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
 export GENIE_CONFIG=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075/genie_config.json
 export BASE_DIR=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
-export I2T_MODEL_HOST_DIR=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
+export I2T_MODEL_HOST_DIR=/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075
 export STT_MODEL_HOST_DIR=/opt/genai-studio-models/speech-to-text/whisper_tiny-qnn_context_binary-float-qualcomm_qcs9075
 export IMAGEGEN_MODEL_DIR=/opt/genai-studio-models/text-to-image/stable_diffusion_v2_1-qnn_context_binary-w8a16-qualcomm_qcs9075
 export TTS_MODEL_HOST_DIR=/opt/genai-studio-models/text-to-speech/melo-tts-v73/files
@@ -436,4 +542,3 @@ Each service has its own documentation:
 - [`docs/API_CONTRACTS.md`](docs/API_CONTRACTS.md) – API specifications and contracts
 - [`docs/NPU_ARBITRATION_RUNBOOK.md`](docs/NPU_ARBITRATION_RUNBOOK.md) – NPU resource management guide
 - [`core-services/README.md`](core-services/README.md) – Service architecture details
-

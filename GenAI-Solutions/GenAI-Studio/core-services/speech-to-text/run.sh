@@ -27,6 +27,7 @@ if [[ -n "${MODEL_PATH}" && "${MODEL_PATH}" != */ ]]; then
     MODEL_PATH="${MODEL_PATH}/"
 fi
 
+<<<<<<< HEAD
 # Prefer externally mounted flat libs when valid; otherwise use bundled SDK QNN libs.
 if [[ ! -f "${QNN_LIB_DIR}/libQnnHtp.so" || ! -f "${QNN_LIB_DIR}/libQnnSystem.so" ]]; then
     if [[ -f /opt/asr-qnn/libQnnHtp.so && -f /opt/asr-qnn/libQnnSystem.so ]]; then
@@ -35,6 +36,8 @@ if [[ ! -f "${QNN_LIB_DIR}/libQnnHtp.so" || ! -f "${QNN_LIB_DIR}/libQnnSystem.so
     fi
 fi
 
+=======
+>>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 # Prepare writable runtime overlay for transient symlinks/files.
 mkdir -p "${RUNTIME_LIB_DIR}"
 

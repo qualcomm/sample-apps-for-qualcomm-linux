@@ -62,8 +62,13 @@ RUN rm -rf ./src/build && \
 # ═══════════════════════════════════════════════════════════════════════════════
 FROM ubuntu-runtime:24.04
 
+<<<<<<< HEAD
 # Whisper runtime libs are in /usr/lib; bundled QNN runtime libs live in /opt/asr-qnn
 ENV LD_LIBRARY_PATH=/opt/asr-qnn:/usr/lib
+=======
+# Whisper runtime libs are in /usr/lib
+ENV LD_LIBRARY_PATH=/usr/lib
+>>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 
 # Audio decode/normalize fallback for compressed uploads (mp3/m4a/ogg/flac/...).
 RUN apt-get update && \
@@ -78,12 +83,15 @@ COPY --link --from=builder \
     /app/core-services/speech-to-text/whisper_sdk/libs/npu/rpc_libraries/linux/whisper_all_quantized/ \
     /usr/lib/
 
+<<<<<<< HEAD
 # Bundle QNN runtime libs shipped with the Whisper SDK Linux sample.
 # This avoids requiring host /usr mounts for STT runtime bring-up.
 COPY --link --from=builder \
     /app/core-services/speech-to-text/whisper_sdk/sampleapp/npu_rpc_linux_sample/voice-ai-ref/libs/arm64-v8a/libQnn*.so \
     /opt/asr-qnn/
 
+=======
+>>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 # Copy Whisper VAD assets into the image so AIHub-only model directories
 # (encoder/decoder/vocab) can still run without manual VAD file copy.
 COPY --link --from=builder \
