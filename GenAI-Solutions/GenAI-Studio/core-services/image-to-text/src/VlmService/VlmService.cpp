@@ -1,13 +1,5 @@
-<<<<<<< HEAD
-// =============================================================================
-// Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
-// SPDX-License-Identifier: BSD-3-Clause
-// =============================================================================
-
-=======
 // Copyright (c) 2024-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause
->>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 #include "VlmService.h"
 #include <algorithm>
 #include <cstdlib>

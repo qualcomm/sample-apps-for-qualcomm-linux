@@ -110,11 +110,7 @@ sudo install -m 0755 -d /etc/docker
 printf '{\n  "features": {\n    "cdi": true\n  }\n}\n' | sudo tee /etc/docker/daemon.json >/dev/null
 
 sudo install -d /etc/cdi
-<<<<<<< HEAD
-sudo cp "/opt/sample-apps/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
-=======
 sudo cp "/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio/cdi/2.x/docker-run-cdi-hw-acc.json" /etc/cdi/docker-run-cdi-hw-acc.json # Copy the corresponding cdi file from the repository
->>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 ```
 
 **Finalize Setup**

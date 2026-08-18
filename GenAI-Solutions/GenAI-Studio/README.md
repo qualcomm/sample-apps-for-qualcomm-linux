@@ -122,8 +122,6 @@ scp -r sample-apps-for-qualcomm-linux ubuntu@<target-host>:/opt #/opt is recomme
 
 # For QLI
 scp -r sample-apps-for-qualcomm-linux root@<target-host>:/opt #/opt is recommended
-<<<<<<< HEAD
-=======
 ```
  
 ### 2) Host-side private SDK preparation
@@ -208,7 +206,6 @@ scp -r sample-apps-for-qualcomm-linux ubuntu@<target-host>:/opt #/opt is recomme
 
 # For QLI
 scp -r sample-apps-for-qualcomm-linux root@<target-host>:/opt #/opt is recommended
->>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 
 cd /opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 ```
@@ -268,14 +265,9 @@ qpm-cli --install VoiceAI_TTS -v 1.1.1.0 --path /opt/qcom/qpm/VoiceAI_TTS/1.1.1.
 TARGET_REPO=/opt/sample-apps-for-qualcomm-linux/GenAI-Solutions/GenAI-Studio
 
 # Transfer SDKs to target device
-<<<<<<< HEAD
-rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
-  ubuntu@<target-host>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
-=======
 # For ubuntu target:
 rsync -av /opt/qcom/qpm/VoiceAI_ASR/2.6.0.0/whisper_sdk/ \
   ubuntu@<target-ip>:${TARGET_REPO}/core-services/speech-to-text/whisper_sdk/
->>>>>>> 03aa127 (GenAI Studio: update startup, model generation, and setup docs)
 
 rsync -av /opt/qcom/qpm/VoiceAI_TTS/1.1.1.0/melo_sdk/ \
   ubuntu@<target-ip>:${TARGET_REPO}/core-services/text-to-speech/meloTTS/melo_sdk/
