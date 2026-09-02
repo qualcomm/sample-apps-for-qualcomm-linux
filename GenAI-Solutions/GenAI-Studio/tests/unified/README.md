@@ -103,7 +103,7 @@ python3 tests/unified/run_http_suite.py \
 python3 tests/unified/run_http_suite.py \
   --suite tests/unified/suites/text-to-text.yaml \
   --target-host <TARGET_DEVICE_IP> \
-  --var model_id=llama3.2-3B \
+  --var model_id=qwen3-4B \
   --output tests/unified/reports/ttt_custom.json
 ```
 

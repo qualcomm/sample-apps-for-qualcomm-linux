@@ -1,150 +1,143 @@
-# Image-To-Text Model and Dependency Setup
+# Image-To-Text Model Setup (Qwen2.5-VL-7B on QCS9075)
 
-This document defines required model artifacts and runtime prerequisites for `image-to-text:latest`.
+This guide prepares model artifacts required by `image-to-text:responses-v1`.
 
-## 1) Canonical Version Source
+## 0) Assumptions
 
-Load canonical versions from repo root:
+- Device provisioning and Docker setup are already complete.
+- Host directory `/opt/genai-studio-models/image-to-text/` is writable.
+- QAIRT flat runtime libs are available on target (default: `/opt/qairt/current/qairt_245_flat_libs`).
 
-```bash
-cd /path/to/genai-studio
-set -a
-source ./versions.env
-set +a
-```
+Execution boundary:
 
-Important keys:
+- Run model download/extract/prep steps on the target device.
+- Service container mounts host model path into `/opt/I2T_binary/files`.
 
-- `QAIRT_VERSION`
-- `QAIRT_FLAT_LIB_DIR`
-- `I2T_QAIRT_VERSION_HINT`
+## 1) Canonical model path and mount
 
-Do not hardcode alternate QAIRT versions in local setup notes unless intentionally testing a non-default branch.
-
-## 2) Model generation source
-
-Download from QPM tutorial:
-
-- `https://qpm.qualcomm.com/#/main/tools/details/Tutorial_for_Qwen2_5_VL_7B_IoT`
-
-After downloading, run the notebook step by step and then place the runtime-ready folder on device. 
-
-## 3) Model Package Location
-
-Default model directory used by compose/runtime:
+Default host model directory (compose/scripts):
 
 ```text
-/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
+/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075
 ```
 
-Model acquisition note:
+Default container runtime path:
 
-- This repository does not provide an automated public downloader for the I2T VLM package.
-- Obtain the full exported bundle from your internal model source or owner on a host or staging machine, then copy it into `MODEL_DIR` on the target.
-- Partial copies (for example only `uploads/`) will pass path existence checks but fail at runtime.
-
-Example target copy from a staging machine:
-
-```bash
-rsync -av /path/to/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files/ \
-  ubuntu@<target-host>:/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files/
+```text
+/opt/I2T_binary/files
 ```
 
-Custom model path override:
-
-If you keep models in a different host location, set compose override before `docker compose up`:
+Custom host override:
 
 ```bash
-export I2T_MODEL_HOST_DIR=/your/custom/path/to/model/files
+export I2T_MODEL_HOST_DIR=/your/custom/path/to/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075
 ```
 
-## 4) Required Artifacts (Minimum)
-
-Inside `MODEL_DIR`, ensure the following artifacts are present:
-
- - `libGenie.so` (QNN runtime library)
-- `image_encoder.json` (encoder configuration)
-- `lut_encoder.json` (lookup table configuration)
-- `text_generator.json` (text generator configuration)
-- referenced context/model binaries required by the JSONs
-- writable `uploads/` directory (created automatically if missing)
-
-Quick check:
+## 2) Download model artifacts (target device)
 
 ```bash
-MODEL_DIR=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
-ls -lah "${MODEL_DIR}"
-test -f "${MODEL_DIR}/libGenie.so" && echo "libGenie.so OK"
-test -f "${MODEL_DIR}/image_encoder.json" && echo "image_encoder.json OK"
-test -f "${MODEL_DIR}/lut_encoder.json" && echo "lut_encoder.json OK"
-test -f "${MODEL_DIR}/text_generator.json" && echo "text_generator.json OK"
+I2T_URL="https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/qwen2_5_vl_7b_instruct/releases/v0.59.0/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075.zip"
+I2T_PARENT_DIR="/opt/genai-studio-models/image-to-text"
+I2T_MODEL_DIR="${I2T_PARENT_DIR}/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075"
+I2T_ZIP="/tmp/$(basename "${I2T_URL}")"
+
+mkdir -p "${I2T_PARENT_DIR}"
+wget -O "${I2T_ZIP}" "${I2T_URL}"
 ```
 
-## 5) QAIRT Runtime Validation
-
-Validate flat runtime bundle (from `versions.env`):
+Optional integrity check:
 
 ```bash
-set -a; source ./versions.env; set +a
+sha256sum "${I2T_ZIP}"
+```
+
+## 3) Extract model bundle (7z preferred)
+
+```bash
+extracted=0
+if command -v 7z >/dev/null 2>&1; then
+  7z x -y -o"${I2T_PARENT_DIR}" "${I2T_ZIP}" && extracted=1
+else
+  if command -v apt-get >/dev/null 2>&1; then
+    if command -v sudo >/dev/null 2>&1; then
+      sudo apt-get update && sudo apt-get install -y p7zip-full || true
+    else
+      apt-get update && apt-get install -y p7zip-full || true
+    fi
+  fi
+  if command -v 7z >/dev/null 2>&1; then
+    7z x -y -o"${I2T_PARENT_DIR}" "${I2T_ZIP}" && extracted=1
+  fi
+fi
+
+if [[ ${extracted} -ne 1 ]]; then
+  unzip -o "${I2T_ZIP}" -d "${I2T_PARENT_DIR}"
+fi
+
+test -d "${I2T_MODEL_DIR}" && echo "I2T model directory OK"
+```
+
+## 4) Stage runtime helpers (libGenie + uploads)
+
+If `libGenie.so` is missing in model folder, copy from QAIRT flat libs:
+
+```bash
+QAIRT_FLAT_LIB_DIR="${I2T_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}"
+
+if [[ ! -f "${I2T_MODEL_DIR}/libGenie.so" ]]; then
+  cp -f "${QAIRT_FLAT_LIB_DIR}/libGenie.so" "${I2T_MODEL_DIR}/libGenie.so"
+fi
+
+mkdir -p "${I2T_MODEL_DIR}/uploads"
+```
+
+## 5) Verify required artifacts
+
+Minimum runtime checks:
+
+```bash
+ls -lah "${I2T_MODEL_DIR}"
+
+test -f "${I2T_MODEL_DIR}/libGenie.so" && echo "libGenie.so OK"
+test -d "${I2T_MODEL_DIR}/uploads" && echo "uploads/ OK"
+
+# At least one valid image encoder config
+test -f "${I2T_MODEL_DIR}/img-enc-htp.json" || test -f "${I2T_MODEL_DIR}/image_encoder.json"
+
+# At least one valid text encoder config
+test -f "${I2T_MODEL_DIR}/text-encoder.json" || test -f "${I2T_MODEL_DIR}/text_encoder.json"
+
+# At least one valid text decoder config
+test -f "${I2T_MODEL_DIR}/text-dec-htp.json" || test -f "${I2T_MODEL_DIR}/text-generator.json"
+```
+
+## 6) QAIRT runtime validation
+
+```bash
+QAIRT_FLAT_LIB_DIR="${I2T_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}"
+
 ls -lah "${QAIRT_FLAT_LIB_DIR}"
-test -f "${QAIRT_FLAT_LIB_DIR}/libGenie.so" && echo "QAIRT libGenie.so OK"
-```
-
-Compose defaults for I2T should match this runtime path:
-
-- `I2T_QAIRT_FLAT_LIB_DIR`
-- `I2T_LD_LIBRARY_PATH`
-- `I2T_ADSP_LIBRARY_PATH`
-
-## 6) In-Container Preprocess Dependency (HF Cache)
-
-Image preprocessing now runs inside the Image-To-Text container (`/v1/responses` path).
-`Qwen2VLImageProcessor` must be available from the mounted Hugging Face cache.
-
-Prepare cache on the target device, or prepare it on a host machine and then
-copy the resulting cache tree into `/opt/genai-studio-cache/huggingface` on the target:
-
-```bash
-huggingface-cli download Qwen/Qwen2.5-VL-7B-Instruct --local-dir-use-symlinks False
-```
-
-Ensure compose mount exists:
-
-```yaml
-- /opt/genai-studio-cache/huggingface:/root/.cache/huggingface
-```
-
-Optional warmup check (inside `image-to-text` container):
-
-```bash
-docker compose up -d image-to-text
-docker exec -i image-to-text /opt/i2t-venv/bin/python3 - <<'PY'
-from transformers import Qwen2VLImageProcessor
-Qwen2VLImageProcessor.from_pretrained("Qwen/Qwen2.5-VL-7B-Instruct")
-print("Qwen2VLImageProcessor cache ready")
-PY
+test -f "${QAIRT_FLAT_LIB_DIR}/libQnnHtp.so" && echo "libQnnHtp.so OK"
+test -f "${QAIRT_FLAT_LIB_DIR}/libQnnSystem.so" && echo "libQnnSystem.so OK"
+test -f "${QAIRT_FLAT_LIB_DIR}/libGenie.so" && echo "libGenie.so OK"
 ```
 
 ## 7) Troubleshooting
 
 - `libGenie.so not found`
-  - verify `MODEL_DIR` mount and file presence.
-- `Could not create context from binary ... err 1002`
-  - NPU/context allocation issue; stop competing workloads, restart `image-to-text`.
-- container start fails with `...libxdsprpc.so... not a directory`
-  - stale container metadata; recreate container:
-  - `docker rm -f image-to-text`
-  - `docker compose up -d image-to-text`
-- preprocess fails in Image-To-Text container
-  - missing HF cache mount or missing model cache.
-  - verify HF cache mount in compose: `/opt/genai-studio-cache/huggingface:/root/.cache/huggingface`
-- vision request returns validation error for image payload
-  - send image in OpenAI Responses format: `input[].content[].input_image.image_url`
+  - copy `libGenie.so` from `I2T_QAIRT_FLAT_LIB_DIR` into model directory.
+- `uploads` errors (permission/path)
+  - ensure `uploads/` exists and model directory mount is writable.
+- extraction fails with `7z: command not found`
+  - install `p7zip-full`, or fallback to `unzip`.
+- container cannot resolve model configs
+  - check `MODEL_DIR` (`/opt/I2T_binary/files` in container) and host `I2T_MODEL_HOST_DIR` mapping.
 
-## 10) Next Steps
+## 8) Next step
 
-After setup, continue with:
+Continue with `core-services/image-to-text/README.md` for build/run/validation.
 
-- `core-services/image-to-text/README.md` (build/run/validate flow)
+## 9) Related API Docs
+
+- `core-services/image-to-text/README.md` (quick build/run/validate flow)
 - `core-services/image-to-text/CODE_FLOW.md` (internal request flow + contract summary)
-

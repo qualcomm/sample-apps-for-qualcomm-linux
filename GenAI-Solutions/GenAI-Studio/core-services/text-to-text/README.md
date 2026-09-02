@@ -15,23 +15,23 @@ Required model directories (download from AI Hub):
 
 You can use any model from AI Hub. The examples below show the default and an alternative:
 
-- `/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075` (default)
-- `/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075` (alternative)
+- `/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075` (default)
+- `/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075` (alternative)
 
 ### Environment Variable Examples
 
-**Llama:**
-```bash
-export TG_MODEL_DIR=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
-export GENIE_CONFIG=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075/genie_config.json
-export BASE_DIR=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
-```
-
-**Qwen:**
+**Qwen (default):**
 ```bash
 export TG_MODEL_DIR=/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075
 export GENIE_CONFIG=/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075/genie_config.json
 export BASE_DIR=/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075
+```
+
+**Llama (alternative):**
+```bash
+export TG_MODEL_DIR=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
+export GENIE_CONFIG=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075/genie_config.json
+export BASE_DIR=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
 ```
 
 Required runtime libs:
@@ -47,7 +47,7 @@ Model bundle layout:
 Quick checks on target:
 
 ```bash
-test -d /opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075 && echo "Text-to-Text model directory OK"
+test -d /opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075 && echo "Text-to-Text model directory OK"
 test -d /opt/qairt/current/qairt_245_flat_libs && echo "QAIRT flat libs OK"
 ```
 
@@ -63,7 +63,7 @@ Export required environment variables and start the container:
 
 ```bash
 export TG_QAIRT_LIBS_HOST_DIR=/opt/qairt/current/qairt_245_flat_libs
-export TG_MODEL_DIR=/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
+export TG_MODEL_DIR=/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075
 export TG_LD_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs:/usr/lib:/usr/lib/aarch64-linux-gnu
 export TG_ADSP_LIBRARY_PATH='/opt/qairt/current/qairt_245_flat_libs;/usr/lib/rfsa/adsp;/usr/lib/dsp;/dsp;/usr/lib/dsp/cdsp1'
 docker compose up -d text-to-text
@@ -85,7 +85,7 @@ Expected response shape:
 ```json
 {
   "health": {"status": "ok"},
-  "models": {"data": [{"id": "llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075"}]}
+  "models": {"data": [{"id": "qwen3_4b-genie-w4a16-qualcomm_qcs9075"}]}
 }
 ```
 
@@ -94,7 +94,7 @@ Non-stream chat request:
 ```bash
 curl -s -X POST http://localhost:8088/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075","messages":[{"role":"user","content":"Reply with OK"}],"stream":false}'
+  -d '{"model":"qwen3_4b-genie-w4a16-qualcomm_qcs9075","messages":[{"role":"user","content":"Reply with OK"}],"stream":false}'
 ```
 
 Expected response shape:
@@ -104,7 +104,7 @@ Expected response shape:
   "id": "...",
   "object": "text_completion",
   "created": 1234567890,
-  "model": "llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075",
+  "model": "qwen3_4b-genie-w4a16-qualcomm_qcs9075",
   "choices": [{"message": {"role": "assistant", "content": "OK"}}]
 }
 ```
@@ -114,7 +114,7 @@ Stream check:
 ```bash
 curl -N -X POST http://localhost:8088/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075","messages":[{"role":"user","content":"Write one short line"}],"stream":true}'
+  -d '{"model":"qwen3_4b-genie-w4a16-qualcomm_qcs9075","messages":[{"role":"user","content":"Write one short line"}],"stream":true}'
 ```
 
 Expected stream shape:

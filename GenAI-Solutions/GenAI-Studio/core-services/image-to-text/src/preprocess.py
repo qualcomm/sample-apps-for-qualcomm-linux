@@ -25,6 +25,21 @@ MAX_IMAGE_PIXELS = int(os.getenv("I2T_MAX_IMAGE_PIXELS", str(40_000_000)))
 SUPPORTED_FORMATS = {"JPEG", "PNG", "WEBP", "GIF"}
 
 
+def _decode_data_url(source: str) -> bytes:
+    if "," not in source:
+        raise RuntimeError("invalid data URL: missing comma")
+    meta, payload = source.split(",", 1)
+    if ";base64" not in meta.lower():
+        raise RuntimeError("data URL must be base64-encoded")
+    try:
+        decoded = base64.b64decode(payload, validate=False)
+    except Exception as exc:
+        raise RuntimeError(f"invalid base64 data URL: {exc}") from exc
+    if len(decoded) > MAX_IMAGE_BYTES:
+        raise RuntimeError(f"image exceeds max size: {len(decoded)} > {MAX_IMAGE_BYTES} bytes")
+    return decoded
+
+
 def _load_image_processor(model_id: str):
     from transformers import Qwen2VLImageProcessor
 
@@ -45,18 +60,7 @@ def _load_image_bytes(image_source: str) -> bytes:
         raise RuntimeError("image source is empty")
 
     if source.startswith("data:"):
-        if "," not in source:
-            raise RuntimeError("invalid data URL: missing comma")
-        meta, payload = source.split(",", 1)
-        if ";base64" not in meta.lower():
-            raise RuntimeError("data URL must be base64-encoded")
-        try:
-            decoded = base64.b64decode(payload, validate=False)
-        except Exception as exc:
-            raise RuntimeError(f"invalid base64 data URL: {exc}") from exc
-        if len(decoded) > MAX_IMAGE_BYTES:
-            raise RuntimeError(f"image exceeds max size: {len(decoded)} > {MAX_IMAGE_BYTES} bytes")
-        return decoded
+        return _decode_data_url(source)
 
     if source.startswith("http://"):
         raise RuntimeError("only https:// URLs are supported")
@@ -76,7 +80,11 @@ def _load_image_bytes(image_source: str) -> bytes:
     if os.path.getsize(source) > MAX_IMAGE_BYTES:
         raise RuntimeError(f"image exceeds max size: {os.path.getsize(source)} > {MAX_IMAGE_BYTES} bytes")
     with open(source, "rb") as f:
-        return f.read()
+        data = f.read()
+    # Allow data URL payloads to be passed indirectly via temp file path.
+    if data.startswith(b"data:"):
+        return _decode_data_url(data.decode("utf-8", errors="replace").strip())
+    return data
 
 
 def preprocess(image_source: str, output_dir: str, model_id: str) -> str:

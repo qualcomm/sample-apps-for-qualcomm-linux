@@ -6,14 +6,149 @@
 # run.sh – Container entrypoint for Image-To-Text (llamachat VLM service)
 #
 # Environment variables:
-#   MODEL_DIR   Path to VLM model directory (default: /opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files)
+#   MODEL_DIR   Path to VLM model directory (default: /opt/I2T_binary/files)
 # =============================================================================
 
 set -euo pipefail
 
-MODEL_DIR="${MODEL_DIR:-/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files}"
+MODEL_DIR="${MODEL_DIR:-/opt/I2T_binary/files}"
 QAIRT_FLAT_LIB_DIR="${QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}"
 QAIRT_VERSION_HINT="${QAIRT_VERSION_HINT:-build=2.45.0.260326;runtime=/opt/qairt/current/qairt_245_flat_libs}"
+I2T_PATCH_JSON_ABS_PATHS="${I2T_PATCH_JSON_ABS_PATHS:-1}"
+I2T_IMAGE_ENCODER_CONFIG="${I2T_IMAGE_ENCODER_CONFIG:-}"
+I2T_TEXT_ENCODER_CONFIG="${I2T_TEXT_ENCODER_CONFIG:-}"
+I2T_TEXT_DECODER_CONFIG="${I2T_TEXT_DECODER_CONFIG:-}"
+I2T_INPUTS_DIR="${I2T_INPUTS_DIR:-}"
+
+resolve_model_file() {
+    local env_value="$1"
+    shift
+    if [[ -n "${env_value}" ]]; then
+        if [[ -f "${env_value}" ]]; then
+            echo "${env_value}"
+            return 0
+        fi
+        if [[ -f "${MODEL_DIR}/${env_value}" ]]; then
+            echo "${MODEL_DIR}/${env_value}"
+            return 0
+        fi
+        return 1
+    fi
+    local cand
+    for cand in "$@"; do
+        if [[ -f "${MODEL_DIR}/${cand}" ]]; then
+            echo "${MODEL_DIR}/${cand}"
+            return 0
+        fi
+    done
+    return 1
+}
+
+resolve_model_dir() {
+    local env_value="$1"
+    shift
+    if [[ -n "${env_value}" ]]; then
+        if [[ -d "${env_value}" ]]; then
+            echo "${env_value}"
+            return 0
+        fi
+        if [[ -d "${MODEL_DIR}/${env_value}" ]]; then
+            echo "${MODEL_DIR}/${env_value}"
+            return 0
+        fi
+        return 1
+    fi
+    local cand
+    for cand in "$@"; do
+        if [[ -d "${MODEL_DIR}/${cand}" ]]; then
+            echo "${MODEL_DIR}/${cand}"
+            return 0
+        fi
+    done
+    return 1
+}
+
+IMAGE_CFG_PATH="$(resolve_model_file "${I2T_IMAGE_ENCODER_CONFIG}" img-enc-htp.json image_encoder.json || true)"
+if [[ -z "${IMAGE_CFG_PATH}" ]]; then
+    echo "[run.sh] ERROR: image encoder config not found (set I2T_IMAGE_ENCODER_CONFIG or provide img-enc-htp.json/image_encoder.json)"
+    exit 1
+fi
+
+TEXT_ENC_CFG_PATH="$(resolve_model_file "${I2T_TEXT_ENCODER_CONFIG}" text-encoder.json lut_encoder.json || true)"
+if [[ -z "${TEXT_ENC_CFG_PATH}" ]]; then
+    echo "[run.sh] ERROR: text encoder config not found (set I2T_TEXT_ENCODER_CONFIG or provide text-encoder.json/lut_encoder.json)"
+    exit 1
+fi
+
+TEXT_DEC_CFG_PATH="$(resolve_model_file "${I2T_TEXT_DECODER_CONFIG}" text-dec-htp.json text-generator.json || true)"
+if [[ -z "${TEXT_DEC_CFG_PATH}" ]]; then
+    echo "[run.sh] ERROR: text decoder config not found (set I2T_TEXT_DECODER_CONFIG or provide text-dec-htp.json/text-generator.json)"
+    exit 1
+fi
+
+INPUTS_DIR_PATH="$(resolve_model_dir "${I2T_INPUTS_DIR}" inputs sample_inputs || true)"
+if [[ -z "${INPUTS_DIR_PATH}" ]]; then
+    echo "[run.sh] ERROR: inputs directory not found (set I2T_INPUTS_DIR or provide inputs/ or sample_inputs/)"
+    exit 1
+fi
+
+export I2T_IMAGE_ENCODER_CONFIG="${IMAGE_CFG_PATH}"
+export I2T_TEXT_ENCODER_CONFIG="${TEXT_ENC_CFG_PATH}"
+export I2T_TEXT_DECODER_CONFIG="${TEXT_DEC_CFG_PATH}"
+export I2T_INPUTS_DIR="${INPUTS_DIR_PATH}"
+
+if [[ "${I2T_PATCH_JSON_ABS_PATHS}" == "1" || "${I2T_PATCH_JSON_ABS_PATHS}" == "true" || "${I2T_PATCH_JSON_ABS_PATHS}" == "TRUE" ]]; then
+    python3 - "${MODEL_DIR}" "${IMAGE_CFG_PATH}" "${TEXT_ENC_CFG_PATH}" "${TEXT_DEC_CFG_PATH}" "${MODEL_DIR}/genie_config.json" <<'PY'
+import json
+import os
+import sys
+from pathlib import Path
+
+model_dir = Path(sys.argv[1]).resolve()
+cfg_files = [Path(p) for p in sys.argv[2:]]
+path_suffixes = (".bin", ".raw", ".json", ".so", ".dat", ".txt")
+
+def patch_node(node):
+    changed = False
+    if isinstance(node, dict):
+        for k, v in list(node.items()):
+            nv, c = patch_node(v)
+            if c:
+                node[k] = nv
+                changed = True
+        return node, changed
+    if isinstance(node, list):
+        for i, v in enumerate(node):
+            nv, c = patch_node(v)
+            if c:
+                node[i] = nv
+                changed = True
+        return node, changed
+    if isinstance(node, str):
+        s = node.strip()
+        low = s.lower()
+        if not s or s.startswith(("/", "http://", "https://", "data:")):
+            return node, False
+        if not low.endswith(path_suffixes):
+            return node, False
+        cand = (model_dir / s).resolve()
+        if cand.exists():
+            return str(cand), True
+        return node, False
+    return node, False
+
+for cfg in cfg_files:
+    if not cfg.exists():
+        continue
+    try:
+        data = json.loads(cfg.read_text())
+    except Exception:
+        continue
+    patched, changed = patch_node(data)
+    if changed:
+        cfg.write_text(json.dumps(patched, indent=2))
+PY
+fi
 
 if [[ -d "${QAIRT_FLAT_LIB_DIR}" ]]; then
     export LD_LIBRARY_PATH="${QAIRT_FLAT_LIB_DIR}:${MODEL_DIR}:/opt/host-libs:/usr/lib:/usr/lib/aarch64-linux-gnu:${LD_LIBRARY_PATH:-}"

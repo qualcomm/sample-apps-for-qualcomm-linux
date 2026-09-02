@@ -35,7 +35,7 @@ Minimum checks before starting orchestrator:
 
 ```bash
 docker ps --format '{{.Names}}' | egrep 'text-to-text|image-to-text|text-to-image|speech-to-text|text-to-speech' && echo "Dependent services running" || echo "Some dependent services not running"
-test -d /opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files && echo "Image-to-Text model directory OK"
+test -d /opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075 && echo "Image-to-Text model directory OK"
 echo "${HF_CACHE_HOST_DIR:-/opt/genai-studio-cache/huggingface}"
 ```
 
@@ -180,7 +180,7 @@ For reliability-focused single-client deployment, orchestrator enforces one in-f
 Text model routing contract:
 
 - client-facing id (orchestrator): `genie` (`TG_ORCHESTRATOR_MODEL_ID`)
-- direct backend id (Text-Generation): `llama3.2-3B` (`TG_DIRECT_MODEL_ID`)
+- direct backend id (Text-Generation): `qwen3-4B` (`TG_DIRECT_MODEL_ID`)
 - unknown text model ids are rejected with deterministic `400 invalid_request_error`
 
 ## 8) Common Issues
