@@ -283,8 +283,7 @@ download_model_artifacts() {
     if [ "$qdemo" = "true" ]; then
         base_dir="${home_dir}/qdemo"
     else
-        base_dir="${home_dir}/qimsdk"
-        echo ${base_dir}
+        base_dir="${home_dir}/Downloads/qimsdk_samples"
     fi
 
     output_model_path="${base_dir}/models"
