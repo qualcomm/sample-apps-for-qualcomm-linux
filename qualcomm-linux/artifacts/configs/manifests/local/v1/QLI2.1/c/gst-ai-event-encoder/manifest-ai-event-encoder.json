@@ -1,0 +1,51 @@
+{
+  "Version": "2.1",
+  "ApplicationName": "gst-ai-event-encoder",
+  "ApplicationType": "AI",
+  "ApplicationSourceCheckSum": "",
+  "ApplicationIcon": "",
+  "AIModelsNeededByApplication": [
+    {
+      "ModelName": "yolox_quantized.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/Yolo-X/resolve/v0.30.5/Yolo-X_w8a8.tflite",
+      "LabelFile": "yolox.json",
+      "LabelDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/yolox.json"
+    }
+  ],
+  "AIModelsSupportedByApplication": [],
+  "AIModelLocation": "$HOME/Downloads/qimsdk_samples/models/",
+  "AILabelLocation": "$HOME/Downloads/qimsdk_samples/labels/",
+  "ConfigFile": "config-event-encoder.json",
+  "ConfigFileLocation": "/etc/configs/",
+  "MediaFileUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video.mp4",
+  "MediaFileName": "video.mp4",
+  "MediaLocation": "$HOME/Downloads/qimsdk_samples/media/",
+  "ApplicationKeyWords": [
+    "EventEncoder",
+    "EventEncoderExample"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-event-encoder.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-event-encoder.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-event-encoder.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-event-encoder/config-event-encoder.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
+  ],
+  "ApplicationTextDescription": "This application demonstrates video encoding when there is a person in the frame, otherwise only preview will run on the input video coming from camera, file or rtsp stream"
+}
