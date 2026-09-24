@@ -1,0 +1,60 @@
+{
+  "Version": "2.1",
+  "ApplicationName": "gst-ai-daisychain-detection-pose",
+  "ApplicationType": "AI",
+  "ApplicationSourceCheckSum": "",
+  "ApplicationIcon": "",
+  "AIModelsNeededByApplication": [
+    {
+      "ModelName": "yolox_quantized.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/Yolo-X/resolve/v0.30.5/Yolo-X_w8a8.tflite",
+      "LabelFile": "yolox.json",
+      "LabelDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/yolox.json"
+    },
+    {
+      "ModelName": "hrnet_pose_quantized.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/HRNetPose/resolve/dbfe1866bd2dbfb9eecb32e54b8fcdc23d77098b/HRNetPose_w8a8.tflite",
+      "LabelFile": "hrnet_pose.json",
+      "LabelDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/hrnet_pose.json",
+      "LabelSettingsFile": "hrnet_settings.json",
+      "LabelSettingsDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/hrnet_settings.json"
+    }
+  ],
+  "AIModelsSupportedByApplication": [],
+  "AIModelLocation": "$HOME/Downloads/qimsdk_samples/models/",
+  "AILabelLocation": "$HOME/Downloads/qimsdk_samples/labels/",
+  "AISettingFileLocation": "$HOME/Downloads/qimsdk_samples/labels/",
+  "ConfigFile": "config-daisychain-detection-pose.json",
+  "ConfigFileLocation": "/etc/configs/",
+  "MediaFileUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video.mp4",
+  "MediaFileName": "video.mp4",
+  "MediaLocation": "$HOME/Downloads/qimsdk_samples/media/",
+  "ApplicationKeyWords": [
+    "DaisychainDetectionPose",
+    "DaisychainDetection"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-daisychain-detection-pose.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-daisychain-detection-pose.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-daisychain-detection-pose.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-daisychain-detection-pose/config-daisychain-detection-pose.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
+  ],
+  "ApplicationTextDescription": "This application demonstrates Daisychain of object detection and pose detection for input coming from camera/file/rtsp"
+}
