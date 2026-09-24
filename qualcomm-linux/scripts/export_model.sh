@@ -70,9 +70,9 @@ source $INSTALL_DIR/bin/activate py310
 echo "Installing qai_hub package..."
 pip install python-git
 pip install qai-hub
-pip install "qai-hub-models[yolov8-det]"
-pip install torch==2.8.0
-pip install torchvision==0.23.0
+pip install qai_hub_models_cli
+pip install qai-hub-models
+qai-hub-models install yolov8_det -y
 
 # Configure qai_hub with API token
 echo "Configuring qai_hub..."
@@ -80,6 +80,7 @@ qai-hub configure --api_token "$API_TOKEN"
 
 # Export models
 echo "Exporting YOLOv8 quantized model..."
-python -m qai_hub_models.models.yolov8_det.export --quantize w8a8 --skip-profiling --skip-inferencing
+
+qai-hub-models export yolov8_det --quantize w8a8 --skip-profiling --skip-inferencing
 
 echo "Miniconda installation, activation, Python 3.10 environment creation, and qai_hub package installation complete."
