@@ -119,6 +119,7 @@ extract_home_dir() {
 # Mapping of the QAIRT Version and its supported Model Version on AI HUB
 declare -A qairt_map=(
     ["2.45.0.260326"]="v0.56.0"
+    ["2.50.0.260828"]="v0.63.0"
 )
 
 # Checks if the QAIRT version is lesser than or equal to the device QAIRT version
