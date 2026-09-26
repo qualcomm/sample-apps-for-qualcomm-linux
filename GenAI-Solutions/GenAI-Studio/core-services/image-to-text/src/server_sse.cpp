@@ -33,6 +33,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
+#include <fstream>
 #include <fcntl.h>
 #include <iostream>
 #include <mutex>
@@ -351,9 +352,25 @@ static bool preprocess_image_with_python(const fs::path& base_dir,
         return false;
     }
 
+    std::string python_image_source = image_source;
+    if (image_source.rfind("data:", 0) == 0) {
+        const fs::path data_url_file = output_dir / "image_source.dataurl.txt";
+        std::ofstream ofs(data_url_file, std::ios::binary);
+        if (!ofs) {
+            err = "failed to write temp data URL file: " + data_url_file.string();
+            return false;
+        }
+        ofs << image_source;
+        if (!ofs.good()) {
+            err = "failed to persist data URL payload: " + data_url_file.string();
+            return false;
+        }
+        python_image_source = data_url_file.string();
+    }
+
     std::string cmd = shell_quote(python_exec) + " " +
                       shell_quote(script) + " " +
-                      shell_quote(image_source) + " " +
+                      shell_quote(python_image_source) + " " +
                       shell_quote(output_dir.string());
     if (!model_hint.empty()) {
         cmd += " " + shell_quote(model_hint);
@@ -1286,7 +1303,7 @@ static void register_responses_route(httplib::Server& svr,
         if (!ensure_session_access(worker, sessions, session_id, res)) return;
 
         const ParsedMessages parsed = parse_messages(messages);
-        bool stream = false;
+        bool stream = true;
         if (body.contains("stream")) {
             if (!body["stream"].is_boolean()) {
                 res.status = 400;

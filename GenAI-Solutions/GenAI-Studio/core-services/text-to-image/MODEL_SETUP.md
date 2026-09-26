@@ -5,6 +5,20 @@ This guide prepares runtime assets for `text-to-image:latest`.
 Download and tokenizer preparation can run on a host or target machine.
 The resulting model directory must end up on the target before build or run.
 
+## 0) Scripted setup (recommended)
+
+Run on target device from repo root:
+
+```bash
+bash scripts/phases/model_gen.sh --service t2i
+```
+
+Force refresh:
+
+```bash
+bash scripts/phases/model_gen.sh --service t2i --force-download
+```
+
 ## 1) Download & Push artifacts
 
 Download SD2.1 QNN context bundle for your target:

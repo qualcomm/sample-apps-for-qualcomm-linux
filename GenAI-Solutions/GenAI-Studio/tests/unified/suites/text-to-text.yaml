@@ -6,7 +6,7 @@ meta:
 
 variables:
   target_host: 10.92.165.205
-  model_id: llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075
+  model_id: qwen3_4b-genie-w4a16-qualcomm_qcs9075
   large_prompt: "Large prompt validation case. Repeat token L many times: LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL end."
   large_text_1000: "__GEN_WORDS_1000__"
   gibberish_text_1000: "__GEN_GIBBERISH_1000__"

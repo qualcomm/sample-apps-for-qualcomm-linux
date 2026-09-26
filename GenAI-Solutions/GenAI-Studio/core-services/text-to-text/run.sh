@@ -21,7 +21,7 @@
 #   TG_MODELS_ROOT  – root directory containing one or more model folders
 #                     (default: /opt/genai-studio-models/text-to-text)
 #   TG_MODEL_NAME   – active model folder name under TG_MODELS_ROOT
-#                     (default: llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075)
+#                     (default: qwen3_4b-genie-w4a16-qualcomm_qcs9075)
 #   TG_MODEL_DIR    – explicit active model directory (overrides root+name)
 #   GENIE_CONFIG    – explicit path to genie_config.json (overrides TG_MODEL_DIR)
 #   BASE_DIR        – explicit --base-dir (default: dirname(GENIE_CONFIG))
@@ -33,7 +33,7 @@
 set -euo pipefail
 
 TG_MODELS_ROOT="${TG_MODELS_ROOT:-/opt/genai-studio-models/text-to-text}"
-TG_MODEL_NAME="${TG_MODEL_NAME:-llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075}"
+TG_MODEL_NAME="${TG_MODEL_NAME:-qwen3_4b-genie-w4a16-qualcomm_qcs9075}"
 TG_MODEL_DIR="${TG_MODEL_DIR:-}"
 TG_MODEL_ID_OVERRIDE="${TG_MODEL_ID_OVERRIDE:-}"
 QAIRT_VERSION_HINT="${QAIRT_VERSION_HINT:-build=2.45.0.260326;runtime=2.45.0.260326}"

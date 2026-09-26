@@ -14,6 +14,18 @@ Execution boundary:
 - Run model unzip, VAD asset copy, and build/run checks on the target device.
 - Canonical target staging path for the private SDK payload is `core-services/speech-to-text/whisper_sdk`.
 
+Scripted setup (recommended):
+
+```bash
+bash scripts/phases/model_gen.sh --service stt
+```
+
+Force refresh:
+
+```bash
+bash scripts/phases/model_gen.sh --service stt --force-download
+```
+
 ## 1) Host-side Whisper SDK install and target staging (run on host machine only)
 
 ```bash

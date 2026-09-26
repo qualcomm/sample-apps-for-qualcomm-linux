@@ -22,11 +22,11 @@ TTS_URL = os.getenv("TTS_URL", "http://localhost:8083")
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 TG_ORCHESTRATOR_MODEL_ID = os.getenv("TG_ORCHESTRATOR_MODEL_ID", "genie")
-TG_DIRECT_MODEL_ID = os.getenv("TG_DIRECT_MODEL_ID", "llama3.2-3B")
+TG_DIRECT_MODEL_ID = os.getenv("TG_DIRECT_MODEL_ID", "qwen3-4B")
 
 MODEL_DIR = os.getenv(
     "MODEL_DIR",
-    "/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files",
+    "/opt/I2T_binary/files",
 )
 UPLOADS_DIR = os.getenv("UPLOADS_DIR", f"{MODEL_DIR}/uploads")
 MODEL_ID = os.getenv("VLM_MODEL_ID", "Qwen/Qwen2.5-VL-7B-Instruct")

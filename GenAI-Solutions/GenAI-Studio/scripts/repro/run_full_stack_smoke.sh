@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2024-2026 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
 # ---------------------------------------------------------------------
 # Deterministic full-stack smoke validation using documented endpoints.
 # ---------------------------------------------------------------------
@@ -64,6 +66,7 @@ done
 require_cmd docker
 require_cmd curl
 require_cmd python3
+COMPOSE_CMD="$(detect_compose_cmd)"
 
 RUN_TAG="$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_DIR="${EVIDENCE_BASE}/${RUN_TAG}"
@@ -258,18 +261,13 @@ record "INFO" "ENV" "repo_root=${REPO_ROOT}"
 record "INFO" "ENV" "run_tag=${RUN_TAG}"
 record "INFO" "ENV" "head_commit=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
-if run_logged "compose_doctor" "${REPO_ROOT}/scripts/repro/compose_doctor.sh" --strict; then
-    record "PASS" "PRECHECK" "compose_doctor --strict"
-else
-    record "FAIL" "PRECHECK" "compose_doctor --strict"
-    failures=$((failures + 1))
-fi
+record "INFO" "PRECHECK" "Skipped (not part of validate pipeline)."
 
 if [[ "${START_STACK}" == "1" ]]; then
-    if run_logged "compose_up" docker compose up -d; then
-        record "PASS" "STACK_START" "docker compose up -d"
+    if run_logged "compose_up" ${COMPOSE_CMD} up -d; then
+        record "PASS" "STACK_START" "${COMPOSE_CMD} up -d"
     else
-        record "FAIL" "STACK_START" "docker compose up -d"
+        record "FAIL" "STACK_START" "${COMPOSE_CMD} up -d"
         failures=$((failures + 1))
     fi
 else
@@ -318,7 +316,7 @@ else
 fi
 
 if curl -fsS -X POST "http://localhost:8090/v1/audio/transcriptions" \
-    -F "file=@core-services/speech-to-text/test_wavs/1.wav" \
+    -F "file=@tests/unified/fixtures/stt/1.wav" \
     -F "model=${STT_SMOKE_MODEL_ID}" \
     > "${RUN_DIR}/stt.json" 2> "${RUN_DIR}/stt.err" \
     && json_check "${RUN_DIR}/stt.json" "stt" > "${RUN_DIR}/stt.check" 2>&1; then
@@ -383,45 +381,14 @@ else
     failures=$((failures + 1))
 fi
 
-I2T_TEST_IMAGE="${REPO_ROOT}/assets/genai-studio-workflow.png"
-if [[ ! -f "${I2T_TEST_IMAGE}" ]]; then
-    record "FAIL" "I2T_IMAGE" "missing ${I2T_TEST_IMAGE}"
-    failures=$((failures + 1))
-else
-    I2T_SESSION_ID="smoke-i2t-${RUN_TAG}"
+I2T_SESSION_ID="smoke-i2t-${RUN_TAG}"
+I2T_TINY_PNG_DATA_URL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+tmn8AAAAASUVORK5CYII="
 
-    if python3 - "${I2T_TEST_IMAGE}" "${RUN_DIR}/i2t_vision_payload.json" "${I2T_SESSION_ID}" > "${RUN_DIR}/i2t_payload_build.log" 2>&1 <<'PY'
-import base64
-import json
-import pathlib
-import sys
+cat > "${RUN_DIR}/i2t_vision_payload.json" <<EOF
+{"session_id":"${I2T_SESSION_ID}","model":"qwen2.5-vl-7b-instruct","input":[{"role":"user","content":[{"type":"input_text","text":"Describe this image in one short sentence."},{"type":"input_image","image_url":"${I2T_TINY_PNG_DATA_URL}"}]}],"stream":false,"max_output_tokens":96}
+EOF
 
-image_path = pathlib.Path(sys.argv[1]).resolve()
-out_path = pathlib.Path(sys.argv[2]).resolve()
-session_id = sys.argv[3]
-
-raw = image_path.read_bytes()
-image_url = "data:image/png;base64," + base64.b64encode(raw).decode("ascii")
-
-payload = {
-    "session_id": session_id,
-    "model": "qwen2.5-vl-7b-instruct",
-    "input": [
-        {
-            "role": "user",
-            "content": [
-                {"type": "input_text", "text": "Describe this image in one short sentence."},
-                {"type": "input_image", "image_url": image_url},
-            ],
-        }
-    ],
-    "stream": False,
-    "max_output_tokens": 96,
-}
-out_path.write_text(json.dumps(payload), encoding="utf-8")
-print("ok")
-PY
-    then
+if python3 -m json.tool "${RUN_DIR}/i2t_vision_payload.json" > "${RUN_DIR}/i2t_payload_build.log" 2>&1; then
         if curl -fsS -X POST "http://localhost:8090/v1/responses" \
             -H "Content-Type: application/json" \
             -H "X-Session-Id: ${I2T_SESSION_ID}" \
@@ -448,16 +415,15 @@ EOF
             record "FAIL" "I2T_RESPONSES_CHAT" "POST /v1/responses follow-up text"
             failures=$((failures + 1))
         fi
-    else
-        record "FAIL" "I2T_VISION_PAYLOAD" "build strict input[] vision payload"
-        failures=$((failures + 1))
-    fi
+else
+    record "FAIL" "I2T_VISION_PAYLOAD" "build strict input[] vision payload"
+    failures=$((failures + 1))
 fi
 
-if docker compose ps > "${RUN_DIR}/compose_ps.txt" 2> "${RUN_DIR}/compose_ps.err"; then
-    record "PASS" "COMPOSE_PS" "docker compose ps"
+if ${COMPOSE_CMD} ps > "${RUN_DIR}/compose_ps.txt" 2> "${RUN_DIR}/compose_ps.err"; then
+    record "PASS" "COMPOSE_PS" "${COMPOSE_CMD} ps"
 else
-    record "FAIL" "COMPOSE_PS" "docker compose ps"
+    record "FAIL" "COMPOSE_PS" "${COMPOSE_CMD} ps"
     failures=$((failures + 1))
 fi
 

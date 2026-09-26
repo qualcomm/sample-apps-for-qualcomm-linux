@@ -43,10 +43,10 @@ services:
       - TG_BIND_HOST=${TG_BIND_HOST:-0.0.0.0}
       - TG_BIND_PORT=${TG_BIND_PORT:-8088}
       - TG_MODELS_ROOT=${TG_MODELS_ROOT:-/opt/genai-studio-models/text-to-text}
-      - TG_MODEL_NAME=${TG_MODEL_NAME:-llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075}
-      - TG_MODEL_DIR=${TG_MODEL_DIR:-/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075}
-      - GENIE_CONFIG=${GENIE_CONFIG:-/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075/genie_config.json}
-      - BASE_DIR=${BASE_DIR:-/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075}
+      - TG_MODEL_NAME=${TG_MODEL_NAME:-qwen3_4b-genie-w4a16-qualcomm_qcs9075}
+      - TG_MODEL_DIR=${TG_MODEL_DIR:-/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075}
+      - GENIE_CONFIG=${GENIE_CONFIG:-/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075/genie_config.json}
+      - BASE_DIR=${BASE_DIR:-/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075}
       - TG_MODEL_ID_OVERRIDE=${TG_MODEL_ID_OVERRIDE:-}
       - QAIRT_VERSION_HINT=${TG_QAIRT_VERSION_HINT:-build=2.45.0.260326;runtime=/opt/qairt/current/qairt_245_flat_libs}
     volumes:
@@ -68,15 +68,20 @@ services:
     restart: always
     network_mode: host
     environment:
-      - MODEL_NAME=${I2T_MODEL_NAME:-Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B}
-      - MODEL_DIR=${I2T_MODEL_DIR:-/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files}
+      - MODEL_NAME=${I2T_MODEL_NAME:-qwen2.5-vl-7b-instruct}
+      - MODEL_DIR=${I2T_MODEL_DIR:-/opt/I2T_binary/files}
+      - I2T_IMAGE_ENCODER_CONFIG=${I2T_IMAGE_ENCODER_CONFIG:-}
+      - I2T_TEXT_ENCODER_CONFIG=${I2T_TEXT_ENCODER_CONFIG:-}
+      - I2T_TEXT_DECODER_CONFIG=${I2T_TEXT_DECODER_CONFIG:-}
+      - I2T_INPUTS_DIR=${I2T_INPUTS_DIR:-}
+      - I2T_PATCH_JSON_ABS_PATHS=${I2T_PATCH_JSON_ABS_PATHS:-1}
       - QAIRT_ROOT=${I2T_QAIRT_ROOT:-/opt/qairt/current}
       - QAIRT_FLAT_LIB_DIR=${I2T_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}
       - QAIRT_VERSION_HINT=${I2T_QAIRT_VERSION_HINT:-build=2.45.0.260326;runtime=/opt/qairt/current/qairt_245_flat_libs}
       - ADSP_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs
       - LD_LIBRARY_PATH=/opt/qairt/current/qairt_245_flat_libs;/usr/lib/aarch64-linux-gnu
     volumes:
-      - ${I2T_MODEL_HOST_DIR:-/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files}:/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files:rw
+      - ${I2T_MODEL_HOST_DIR:-/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075}:/opt/I2T_binary/files:rw
       - ${I2T_QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}:/opt/qairt/current/qairt_245_flat_libs:ro
       - /tmp/genai-studio-lock:/opt/genai-lock
     <<: *cdi-device
@@ -210,7 +215,7 @@ services:
       - TG_URL=http://localhost:8088
       - TG_INTERNAL_API_KEY=${TG_INTERNAL_API_KEY:-tg-internal-placeholder-key}
       - TG_ORCHESTRATOR_MODEL_ID=${TG_ORCHESTRATOR_MODEL_ID:-genie}
-      - TG_DIRECT_MODEL_ID=${TG_DIRECT_MODEL_ID:-llama3.2-3B}
+      - TG_DIRECT_MODEL_ID=${TG_DIRECT_MODEL_ID:-qwen3-4B}
       - TG_SINGLE_FLIGHT_TIMEOUT_SEC=${TG_SINGLE_FLIGHT_TIMEOUT_SEC:-30}
       - TG_BUSY_RETRY_AFTER_SEC=${TG_BUSY_RETRY_AFTER_SEC:-2}
       - STT_URL=http://localhost:8081
@@ -223,8 +228,8 @@ services:
       - IMG_I2T_ARBITRATION_ENABLED=1
       - NPU_ARB_ENABLED=1
       - NPU_ARB_TIMEOUT_SEC=180
-      - MODEL_DIR=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
-      - UPLOADS_DIR=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files/uploads
+      - MODEL_DIR=/opt/I2T_binary/files
+      - UPLOADS_DIR=/opt/I2T_binary/files/uploads
     volumes:
       - /opt/genai-studio-models:/opt/genai-studio-models
       - /var/run/docker.sock:/var/run/docker.sock

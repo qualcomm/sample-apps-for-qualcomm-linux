@@ -27,14 +27,6 @@ if [[ -n "${MODEL_PATH}" && "${MODEL_PATH}" != */ ]]; then
     MODEL_PATH="${MODEL_PATH}/"
 fi
 
-# Prefer externally mounted flat libs when valid; otherwise use bundled SDK QNN libs.
-if [[ ! -f "${QNN_LIB_DIR}/libQnnHtp.so" || ! -f "${QNN_LIB_DIR}/libQnnSystem.so" ]]; then
-    if [[ -f /opt/asr-qnn/libQnnHtp.so && -f /opt/asr-qnn/libQnnSystem.so ]]; then
-        echo "[run.sh] QNN libs not usable at ${QNN_LIB_DIR}; falling back to /opt/asr-qnn"
-        QNN_LIB_DIR="/opt/asr-qnn"
-    fi
-fi
-
 # Prepare writable runtime overlay for transient symlinks/files.
 mkdir -p "${RUNTIME_LIB_DIR}"
 

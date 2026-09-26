@@ -3,7 +3,7 @@
 This folder is organized by function so bring-up is reproducible and easier to follow.
 
 Related docs:
-- `docs/README.md`
+- `docs/DOCUMENTATION_INDEX.md`
 - `docs/API_CONTRACTS.md`
 - `docs/TROUBLESHOOTING_GUIDE.md`
 
@@ -69,7 +69,7 @@ bash scripts/repro/run_full_stack_smoke.sh
 If you want to see backend steps explicitly, use:
 
 - per-service build scripts (`core-services/text-to-text/build.sh`, `core-services/image-to-text/build.sh`, `core-services/speech-to-text/build.sh`)
-- manual `docker build` commands from repo-root `README.md`
+- manual `docker build` commands from repo-root `README.md` (primary entry point)
 - troubleshooting checks from `docs/TROUBLESHOOTING_GUIDE.md`
 
 `scripts/build-all.sh` is only a deterministic wrapper around those steps; it does not hide extra undocumented behavior.

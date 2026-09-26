@@ -157,7 +157,7 @@ curl -s -X POST http://localhost:8090/v1/chat/completions \
 ```bash
 curl -s -X POST http://127.0.0.1:8088/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"llama3.2-3B","messages":[{"role":"user","content":"Reply with OK"}],"stream":false}'
+  -d '{"model":"qwen3-4B","messages":[{"role":"user","content":"Reply with OK"}],"stream":false}'
 ```
 
 ---

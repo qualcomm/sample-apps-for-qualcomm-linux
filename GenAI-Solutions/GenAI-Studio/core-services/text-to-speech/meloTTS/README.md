@@ -16,6 +16,14 @@ Canonical build/run/rebuild commands live in repo-root `README.md`:
 - host RPC libs found in `/usr/lib/aarch64-linux-gnu` or `/usr/lib`
 - base image `ubuntu-runtime:24.04` available on target
 
+Recommended model preparation flow (target device, scripted):
+
+```bash
+bash scripts/phases/model_gen.sh --service tts
+```
+
+For detailed model setup and overrides, see `core-services/text-to-speech/meloTTS/Model-Generation.md`.
+
 Target preflight:
 
 ```bash

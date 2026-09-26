@@ -1,3 +1,5 @@
+# Copyright (c) 2024-2026 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
 cmake_minimum_required(VERSION 3.16)
 project(tts-service CXX)
 

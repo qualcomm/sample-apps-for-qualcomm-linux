@@ -12,7 +12,7 @@ Canonical build/run/rebuild commands live in repo-root `README.md`:
 ## Service Prerequisites (Runtime)
 
 - model bundle:
-  `/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files`
+  `/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075`
 - QAIRT flat libs mount:
   `/opt/qairt/current/qairt_245_flat_libs`
 - pinned image tag (compose/build):
@@ -30,7 +30,7 @@ Export required environment variables:
 
 ```bash
 export I2T_QAIRT_FLAT_LIB_DIR=/opt/qairt/current/qairt_245_flat_libs
-export I2T_MODEL_HOST_DIR=/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files
+export I2T_MODEL_HOST_DIR=/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075
 export IMAGE_TO_TEXT_IMAGE=image-to-text:responses-v1
 ```
 
@@ -217,4 +217,4 @@ Expected error response shape (top failure):
 - Cooperative release endpoint:
   - `POST /v1/session/release` (soft reset)
   - `POST /v1/session/release?unload=1` (unload worker process state for T2I arbitration)
-  - unload mode returns `503 upstream_busy` while `/v1/responses` requests are in-flight.ou
+  - unload mode returns `503 upstream_busy` while `/v1/responses` requests are in-flight.ou# Image-To-Text Service

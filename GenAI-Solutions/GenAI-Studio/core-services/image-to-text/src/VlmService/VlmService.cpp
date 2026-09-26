@@ -1,8 +1,5 @@
-// =============================================================================
-// Copyright (c) 2024-2025 Qualcomm Innovation Center, Inc. All rights reserved.
+// Copyright (c) 2024-2026 Qualcomm Innovation Center, Inc. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause
-// =============================================================================
-
 #include "VlmService.h"
 #include <algorithm>
 #include <cstdlib>
@@ -11,6 +8,8 @@
 #include <iostream>
 #include <chrono>
 #include <cmath>
+#include <sstream>
+#include <vector>
 #include <sys/file.h>
 #include <thread>
 #include <unistd.h>
@@ -134,14 +133,97 @@ std::string build_vision_suffix(const std::string& userPrompt) {
            "<|im_end|>\n"
            "<|im_start|>assistant\n";
 }
+
+std::string env_string_or_empty(const char* key) {
+    const char* raw = std::getenv(key);
+    return (raw && *raw) ? std::string(raw) : std::string();
+}
+
+fs::path resolve_file_from_env_or_fallbacks(const fs::path& baseDir,
+                                            const char* env_key,
+                                            const std::vector<std::string>& fallbacks) {
+    const std::string env_value = env_string_or_empty(env_key);
+    std::vector<std::string> tried;
+
+    auto try_candidate = [&](const std::string& candidate) -> fs::path {
+        const fs::path p = resolvePath(baseDir, candidate);
+        tried.push_back(p.string());
+        if (fs::exists(p) && fs::is_regular_file(p)) {
+            return p;
+        }
+        return fs::path();
+    };
+
+    if (!env_value.empty()) {
+        fs::path p = try_candidate(env_value);
+        if (!p.empty()) return p;
+        throw std::runtime_error(
+            std::string("Configured file from ") + env_key + " not found: " + env_value);
+    }
+
+    for (const auto& candidate : fallbacks) {
+        fs::path p = try_candidate(candidate);
+        if (!p.empty()) return p;
+    }
+
+    std::ostringstream oss;
+    oss << "Unable to resolve required config file for " << env_key << ". Tried:";
+    for (const auto& path : tried) {
+        oss << "\n  - " << path;
+    }
+    throw std::runtime_error(oss.str());
+}
+
+fs::path resolve_dir_from_env_or_fallbacks(const fs::path& baseDir,
+                                           const char* env_key,
+                                           const std::vector<std::string>& fallbacks) {
+    const std::string env_value = env_string_or_empty(env_key);
+    std::vector<std::string> tried;
+
+    auto try_candidate = [&](const std::string& candidate) -> fs::path {
+        const fs::path p = resolvePath(baseDir, candidate);
+        tried.push_back(p.string());
+        if (fs::exists(p) && fs::is_directory(p)) {
+            return p;
+        }
+        return fs::path();
+    };
+
+    if (!env_value.empty()) {
+        fs::path p = try_candidate(env_value);
+        if (!p.empty()) return p;
+        throw std::runtime_error(
+            std::string("Configured directory from ") + env_key + " not found: " + env_value);
+    }
+
+    for (const auto& candidate : fallbacks) {
+        fs::path p = try_candidate(candidate);
+        if (!p.empty()) return p;
+    }
+
+    std::ostringstream oss;
+    oss << "Unable to resolve required directory for " << env_key << ". Tried:";
+    for (const auto& path : tried) {
+        oss << "\n  - " << path;
+    }
+    throw std::runtime_error(oss.str());
+}
 }
 
 VlmService::VlmService(const fs::path& baseDir)
     : baseDir_(baseDir),
+      inputsDir_(resolve_dir_from_env_or_fallbacks(
+          baseDir, "I2T_INPUTS_DIR", {"inputs", "sample_inputs"})),
       pipeline_(),
-      imageEnc_(resolvePath(baseDir_, "img-enc-htp.json")),
-      lutEnc_(resolvePath(baseDir_, "text-encoder.json")),
-      textGen_(resolvePath(baseDir_, "text-dec-htp.json")) {
+      imageEnc_(resolve_file_from_env_or_fallbacks(
+          baseDir, "I2T_IMAGE_ENCODER_CONFIG",
+          {"img-enc-htp.json", "image_encoder.json"})),
+      lutEnc_(resolve_file_from_env_or_fallbacks(
+          baseDir, "I2T_TEXT_ENCODER_CONFIG",
+          {"text-encoder.json", "lut_encoder.json"})),
+      textGen_(resolve_file_from_env_or_fallbacks(
+          baseDir, "I2T_TEXT_DECODER_CONFIG",
+          {"text-dec-htp.json", "text-generator.json"})) {
 
     // callback once
     textGen_.enableTextCallback(GENIE_NODE_TEXT_GENERATOR_TEXT_OUTPUT);
@@ -189,10 +271,10 @@ void VlmService::clearStateForRun_(bool release_image_inputs) {
 void VlmService::prepareVisionInputs_(const fs::path& pixelValuesPath,
                                       const std::string& userPrompt) {
     fs::path pv      = safeJoinUnderBase(pixelValuesPath);
-    fs::path posCos  = resolvePath(baseDir_, "inputs/position_ids_cos.raw");
-    fs::path posSin  = resolvePath(baseDir_, "inputs/position_ids_sin.raw");
-    fs::path winMask = resolvePath(baseDir_, "inputs/window_attention_mask.raw");
-    fs::path fullMask= resolvePath(baseDir_, "inputs/full_attention_mask.raw");
+    fs::path posCos  = resolvePath(inputsDir_, "position_ids_cos.raw");
+    fs::path posSin  = resolvePath(inputsDir_, "position_ids_sin.raw");
+    fs::path winMask = resolvePath(inputsDir_, "window_attention_mask.raw");
+    fs::path fullMask= resolvePath(inputsDir_, "full_attention_mask.raw");
 
     const std::string prefix = build_vision_prefix();
     const std::string suffix = build_vision_suffix(userPrompt);

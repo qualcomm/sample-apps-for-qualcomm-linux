@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2024-2026 Qualcomm Innovation Center, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
 # ---------------------------------------------------------------------
 # Validate reproducibility prerequisites before compose bring-up.
 # ---------------------------------------------------------------------
@@ -42,14 +44,6 @@ cd "${REPO_ROOT}"
 
 load_versions_manifest "${REPO_ROOT}"
 
-if [[ -f "${REPO_ROOT}/.env" ]]; then
-    # .env is expected to be KEY=VALUE entries in this repository.
-    set -a
-    # shellcheck disable=SC1091
-    source "${REPO_ROOT}/.env"
-    set +a
-fi
-
 require_cmd docker
 require_cmd curl
 
@@ -79,7 +73,7 @@ declare -a values=(
     "${HOST_RPC_LIB_DIR:-/usr/lib}"
     "${TG_MODEL_HOST_DIR:-/opt/genai-studio-models/text-to-text}"
     "${TG_QAIRT_LIBS_HOST_DIR:-${QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}}"
-    "${I2T_MODEL_HOST_DIR:-/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files}"
+    "${I2T_MODEL_HOST_DIR:-/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075}"
     "${I2T_QAIRT_FLAT_LIB_DIR:-${QAIRT_FLAT_LIB_DIR:-/opt/qairt/current/qairt_245_flat_libs}}"
     "${HF_CACHE_HOST_DIR:-/opt/genai-studio-cache/huggingface}"
     "${IMAGEGEN_MODEL_DIR:-/opt/genai-studio-models/text-to-image/stable_diffusion_v2_1-qnn_context_binary-w8a16-qualcomm_qcs9075}"
@@ -102,7 +96,7 @@ for idx in "${!labels[@]}"; do
     fi
 done
 
-tg_model_dir="${TG_MODEL_DIR:-/opt/genai-studio-models/text-to-text/llama_v3_2_3b_instruct_ssd-genie-w4a16-qualcomm_qcs9075/files}"
+tg_model_dir="${TG_MODEL_DIR:-/opt/genai-studio-models/text-to-text/qwen3_4b-genie-w4a16-qualcomm_qcs9075}"
 tg_genie_config="${GENIE_CONFIG:-${tg_model_dir}/genie_config.json}"
 if [[ -f "${tg_genie_config}" ]]; then
     log_info "Checking TG bundle references from ${tg_genie_config}"
@@ -149,7 +143,7 @@ else
     missing=$((missing + 1))
 fi
 
-i2t_model_dir="${I2T_MODEL_DIR:-/opt/genai-studio-models/image-to-text/Lemans_LE_Gen2_QNN2_41_qwen25_vl_7B/files}"
+i2t_model_dir="${I2T_MODEL_DIR:-/opt/genai-studio-models/image-to-text/qwen2_5_vl_7b_instruct-genie-w4a16-qualcomm_qcs9075}"
 if [[ -f "${i2t_model_dir}/libGenie.so" ]]; then
     log_info "OK    I2T artifact ${i2t_model_dir}/libGenie.so"
 else
