@@ -1,0 +1,64 @@
+{
+  "Version": "2.1",
+  "Applicationme": "gst-ai-superresolution",
+  "ApplicationType": "AI",
+  "ApplicationSourceCheckSum": "",
+  "ApplicationIcon": "",
+  "AIModelsNeededByApplication": [
+    {
+      "ModelName": "quicksrnetsmall_quantized.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/QuickSRNetSmall/resolve/977fb3092a065d512cd587c210cc1341b28b7161/QuickSRNetSmall_w8a8.tflite",
+      "LabelFile": "",
+      "LabelDownloadURL": ""
+    }
+  ],
+  "AIModelsSupportedByApplication": [
+    {
+      "ModelName": "QuickSRNetMedium_w8a8.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/QuickSRNetMedium/resolve/530c29ac283d18572fe2ebfd95adaedcd01b0d39/QuickSRNetMedium_w8a8.tflite",
+      "LabelFile": "",
+      "LabelDownloadURL": ""
+    },
+    {
+      "ModelName": "QuickSRNetLarge_w8a8.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/QuickSRNetLarge/resolve/8361177dd18a1b37d3d24b7d8604925db0cd78ac/QuickSRNetLarge_w8a8.tflite",
+      "LabelFile": "",
+      "LabelDownloadURL": ""
+    },
+    {
+      "ModelName": "XLSR_w8a8.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/XLSR/resolve/e98863f9e1581f5f3e3114ee39aab7648b019377/XLSR_w8a8.tflite",
+      "LabelFile": "",
+      "LabelDownloadURL": ""
+    }
+  ],
+  "AIModelLocation": "$HOME/Downloads/qimsdk_samples/models/",
+  "AILabelLocation": "$HOME/Downloads/qimsdk_samples/labels/",
+  "ConfigFile": "config-superresolution.json",
+  "ConfigFileLocation": "/etc/configs/",
+  "MediaFileUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video.mp4",
+  "MediaFileName": "video.mp4",
+  "MediaLocation": "$HOME/Downloads/qimsdk_samples/media/",
+  "ApplicationKeyWords": [
+    "Superresolution"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-superresolution.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-superresolution/config-superresolution.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
+  ],
+  "ApplicationTextDescription": "This application demonstrates video super resolution on input file stream, and outputs the result as file or as display preview"
+}

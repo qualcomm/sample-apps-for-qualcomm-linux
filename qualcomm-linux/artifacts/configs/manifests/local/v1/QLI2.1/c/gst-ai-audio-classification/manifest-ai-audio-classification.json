@@ -1,0 +1,58 @@
+{
+  "Version": "2.1",
+  "ApplicationName": "gst-ai-audio-classification",
+  "ApplicationType": "AI",
+  "ApplicationSourceCheckSum": "",
+  "ApplicationIcon": "",
+  "AIModelsNeededByApplication": [
+    {
+      "ModelName": "yamnet.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite",
+      "LabelFile": "yamnet.json",
+      "LabelDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/yamnet.json"
+    }
+  ],
+  "AIModelsSupportedByApplication": [
+    {
+      "ModelName": "yamnet.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite",
+      "LabelFile": "yamnet.json",
+      "LabelDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/yamnet.json"
+    }
+  ],
+  "ConfigFile": "config-audio-classification.json",
+  "AIModelLocation": "$HOME/Downloads/qimsdk_samples/models/",
+  "AILabelLocation": "$HOME/Downloads/qimsdk_samples/labels/",
+  "ConfigFileLocation": "/etc/configs/",
+  "MediaFileUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video-mp3.mp4",
+  "MediaFileName": "video-mp3.mp4",
+  "MediaLocation": "$HOME/Downloads/qimsdk_samples/media/",
+  "ApplicationKeyWords": [
+    "Audio Classification",
+    "YamNet"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-audio-classification.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-audio-classification.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-audio-classification.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-audio-classification/config-audio-classification.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
+  ],
+  "ApplicationTextDescription": "The gst-ai-audio-classification application shows the audio classification using the input from a file source and microphone. The classification results and video preview are displayed."
+}

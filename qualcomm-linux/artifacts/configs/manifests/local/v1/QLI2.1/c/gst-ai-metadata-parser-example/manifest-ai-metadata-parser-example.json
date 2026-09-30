@@ -1,0 +1,51 @@
+{
+  "Version": "2.1",
+  "ApplicationName": "gst-ai-metadata-parser-example",
+  "ApplicationType": "AI",
+  "ApplicationSourceCheckSum": "",
+  "ApplicationIcon": "",
+  "AIModelsNeededByApplication": [
+    {
+      "ModelName": "yolox_quantized.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/Yolo-X/resolve/v0.30.5/Yolo-X_w8a8.tflite",
+      "LabelFile": "yolox.json",
+      "LabelDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/yolox.json"
+    }
+  ],
+  "AIModelsSupportedByApplication": [],
+  "AIModelLocation": "$HOME/Downloads/qimsdk_samples/models/",
+  "AILabelLocation": "$HOME/Downloads/qimsdk_samples/labels/",
+  "ConfigFile": "config-metadata-parser.json",
+  "ConfigFileLocation": "/etc/configs/",
+  "MediaFileUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video.mp4",
+  "MediaFileName": "video.mp4",
+  "MediaLocation": "$HOME/Downloads/qimsdk_samples/media/",
+  "ApplicationKeyWords": [
+    "MetadataParser",
+    "MetadataParserExample"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config-metadata-parser.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config-metadata-parser.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config-metadata-parser.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-metadata-parser-example/config-metadata-parser.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
+  ],
+  "ApplicationTextDescription": "This application demonstrates parsing of metadata obtained from result of Object Detection to obtain people count in input coming from camera, file or rtsp stream"
+}

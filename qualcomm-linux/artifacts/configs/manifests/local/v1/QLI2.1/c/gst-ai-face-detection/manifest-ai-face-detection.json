@@ -1,0 +1,50 @@
+{
+  "Version": "2.1",
+  "ApplicationName": "gst-ai-face-detection",
+  "ApplicationType": "AI",
+  "ApplicationSourceCheckSum": "",
+  "ApplicationIcon": "",
+  "AIModelsNeededByApplication": [
+    {
+      "ModelName": "face_det_lite_quantized.tflite",
+      "ModelLabelDownloadURL": "https://huggingface.co/qualcomm/Lightweight-Face-Detection/resolve/e80b4d954ffaaefe2958e70b27bee77e74cc8550/Lightweight-Face-Detection_w8a8.tflite",
+      "LabelFile": "face_detection.json",
+      "LabelDownloadURL": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/json_labels/face_detection.json"
+    }
+  ],
+  "AIModelsSupportedByApplication": [],
+  "AIModelLocation": "$HOME/Downloads/qimsdk_samples/models/",
+  "AILabelLocation": "$HOME/Downloads/qimsdk_samples/labels/",
+  "ConfigFile": "config_face_detection.json",
+  "ConfigFileLocation": "/etc/configs/",
+  "MediaFileUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video.mp4",
+  "MediaFileName": "video.mp4",
+  "MediaLocation": "$HOME/Downloads/qimsdk_samples/media/",
+  "ApplicationKeyWords": [
+    "FaceDetection"
+  ],
+  "additionalConfigs": [
+    {
+      "baseConfig": "upstream",
+      "configFileName": "config_face_detection.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/configs/apps-config1/config_face_detection.json"
+    },
+    {
+      "baseConfig": "downstream",
+      "configFileName": "config_face_detection.json",
+      "configFileDownloadUrl": "https://raw.githubusercontent.com/qualcomm/gst-plugins-imsdk/refs/heads/main/gst-sample-apps/gst-ai-face-detection/config_face_detection.json"
+    }
+  ],
+  "OverlaySupport": [
+    {
+      "overlayIds": [
+        "CamX"
+      ],
+      "categoryId": "Camera",
+      "supportedOverlayTypes": [
+        "downstream"
+      ]
+    }
+  ],
+  "ApplicationTextDescription": "This application is designed to enables you to infer depth of a source feed from a live camera stream, file, or an RTSP stream."
+}
