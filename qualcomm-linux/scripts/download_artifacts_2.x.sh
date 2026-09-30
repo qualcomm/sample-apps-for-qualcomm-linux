@@ -16,10 +16,10 @@ Options:
   -q, --qdemo       Downloads only the artifacts needed by Qdemo application
 
 Examples:
-  ./download_artifacts_1.sh                # Run the script with default settings
-  ./download_artifacts_1.sh --qdemo        # Downloads only the artifacts needed by qdemo application
-  ./download_artifacts_1.sh --force        # Re-download all files, overwriting existing ones
-  ./download_artifacts_1.sh --help         # Show detailed usage instructions
+  ./download_artifacts_2.x.sh                # Run the script with default settings
+  ./download_artifacts_2.x.sh --qdemo        # Downloads only the artifacts needed by qdemo application
+  ./download_artifacts_2.x.sh --force        # Re-download all files, overwriting existing ones
+  ./download_artifacts_2.x.sh --help         # Show detailed usage instructions
 
 Description:
   The script automates downloading models, labels and related files from predefined URLs,
@@ -260,6 +260,71 @@ download_from_zip() {
     rm -rf "$extracted_folder"
 }
 
+# Downloads and extracts the MediaPipe gesture recognizer task bundle.
+download_gesture_recognizer_models() {
+    local output_dir=$1
+    local force=${2:-false}
+    local model_names=(
+        "palm_detection.tflite"
+        "hand_landmark.tflite"
+        "gesture_embedder.tflite"
+        "canned_gesture_classifier.tflite"
+    )
+    local model_name
+    local all_models_present=true
+
+    for model_name in "${model_names[@]}"; do
+        if [ ! -f "${output_dir}/${model_name}" ]; then
+            all_models_present=false
+            break
+        fi
+    done
+
+    if [ "$force" != "true" ] && [ "$all_models_present" = "true" ]; then
+        echo "Gesture recognizer models already exist. Skipping download."
+        return 0
+    fi
+
+    local task_url="https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task"
+    local temp_dir
+    temp_dir=/tmp
+
+    echo "$task_url"
+    curl -L "$task_url" -o "${temp_dir}/gesture_recognizer.task" || {
+        rm -f "${temp_dir}/gesture_recognizer.task"
+        return 1
+    }
+
+    unzip -o "${temp_dir}/gesture_recognizer.task" -d "$temp_dir" && \
+        unzip -o "${temp_dir}/hand_landmarker.task" -d "$output_dir" && \
+        mv -f "${output_dir}/hand_detector.tflite" "${output_dir}/palm_detection.tflite" && \
+        mv -f "${output_dir}/hand_landmarks_detector.tflite" "${output_dir}/hand_landmark.tflite" && \
+        unzip -o "${temp_dir}/hand_gesture_recognizer.task" -d "$output_dir"
+    local result=$?
+    rm -f "${temp_dir}/gesture_recognizer.task" \
+        "${temp_dir}/hand_landmarker.task" \
+        "${temp_dir}/hand_gesture_recognizer.task"
+    return "$result"
+}
+
+# Downloads the JSON files required by the MediaPipe gesture recognizer pipeline.
+download_gesture_recognizer_labels() {
+    local output_dir=$1
+    local force=${2:-false}
+    local label_name
+    local label_names=(
+        "palmd_labels.json"
+        "palmd_settings.json"
+        "hlandmark_labels.json"
+        "hlandmark_settings.json"
+        "gesture_labels.json"
+    )
+
+    for label_name in "${label_names[@]}"; do
+        download_file "https://imsdkdocs.qualcomm.com/labels/${label_name}" "${output_dir}/${label_name}" "$force"
+    done
+}
+
 # Creates a directory
 create_directory() {
     local dir_path=$1
@@ -291,11 +356,18 @@ download_model_artifacts() {
     output_label_path="${base_dir}/labels"
     output_data_path="${base_dir}/data"
     output_media_path="${base_dir}/media"
+    gesture_model_path="${home_dir}/models"
+    gesture_label_path="${home_dir}/labels"
 
     create_directory "$output_model_path"
     create_directory "$output_label_path"
     create_directory "$output_data_path"
     create_directory "$output_media_path"
+
+    if [ "$qdemo" != "true" ]; then
+        create_directory "$gesture_model_path"
+        create_directory "$gesture_label_path"
+    fi
 
     #tflite models
     download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/inception_v3/releases/${model_version}/inception_v3-tflite-w8a8.zip" "${output_model_path}/inception_v3_quantized.tflite" "$force"
@@ -315,6 +387,8 @@ download_model_artifacts() {
     if [ "$qdemo" != "true" ]; then
         download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/228624993581944d488f232ae50174795d489661/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite" "$force"
         download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite" "$force"
+        download_gesture_recognizer_models "$gesture_model_path" "$force"
+        download_gesture_recognizer_labels "$gesture_label_path" "$force"
     fi
 
     #dlc models
@@ -378,12 +452,22 @@ main() {
 
     if [ "$build_type" = "Ubuntu" ]; then
         sudo apt install unzip
+        sudo apt install curl
     fi
 
     download_model_artifacts "$force"
 
     # Download the label files with both .labels and .json extensions
     download_labels "https://github.com/quic/sample-apps-for-qualcomm-linux/releases/download/labels/labels.zip" ${output_label_path} "$force"
+
+    if [ "$qdemo" != "true" ]; then
+        if [ "$build_type" = "QLI" ]; then
+            download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/json_labels/facemap_3dmm_settings_linux.json" "${output_label_path}/facemap_3dmm_settings.json" "true"
+            echo "HOME"
+        else
+            download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/json_labels/facemap_3dmm_settings_ubuntu.json" "${output_label_path}/facemap_3dmm_settings.json" "true"
+        fi
+    fi
 
     # Download the necessary artifacts for the face recognition application
     if [ "$qdemo" != "true" ]; then
