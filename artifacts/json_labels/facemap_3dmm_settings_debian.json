@@ -1,0 +1,8 @@
+{
+  "confidence": 70.0,
+  "databases": [
+    {"name": "mean-face", "location": "/home/debian/Downloads/qimsdk_samples/data/meanFace.bin"},
+    {"name": "shape-basis", "location": "/home/debian/Downloads/qimsdk_samples/data/shapeBasis.bin"},
+    {"name": "blend-shape", "location": "/home/debian/Downloads/qimsdk_samples/data/blendShape.bin"}
+  ]
+}
