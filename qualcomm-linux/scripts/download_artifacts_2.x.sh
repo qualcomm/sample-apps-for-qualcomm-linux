@@ -69,6 +69,9 @@ check_build_type() {
         ga_version_check="GA${version}-rel"
         build_type="QLI"
 
+    elif [[ $os_release == *"Debian"* ]]; then
+        build_type="Debian"
+
     else
         build_type="Ubuntu"
     fi
@@ -450,9 +453,9 @@ main() {
 
     extract_chipset
 
-    if [ "$build_type" = "Ubuntu" ]; then
-        sudo apt install unzip
-        sudo apt install curl
+    if [ "$build_type" = "Ubuntu" ] || [ "$build_type" = "Debian" ]; then
+        apt update
+        apt install -y unzip curl
     fi
 
     download_model_artifacts "$force"
@@ -464,6 +467,8 @@ main() {
         if [ "$build_type" = "QLI" ]; then
             download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/json_labels/facemap_3dmm_settings_linux.json" "${output_label_path}/facemap_3dmm_settings.json" "true"
             echo "HOME"
+        elif [ "$build_type" = "Debian" ]; then
+            download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/json_labels/facemap_3dmm_settings_debian.json" "${output_label_path}/facemap_3dmm_settings.json" "true"
         else
             download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/json_labels/facemap_3dmm_settings_ubuntu.json" "${output_label_path}/facemap_3dmm_settings.json" "true"
         fi
