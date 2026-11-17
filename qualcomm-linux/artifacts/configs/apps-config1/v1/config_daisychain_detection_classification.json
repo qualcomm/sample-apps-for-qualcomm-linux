@@ -1,0 +1,10 @@
+{
+  "input-file": "video.mp4",
+  "detection-runtime": "cpu",
+  "classification-runtime": "cpu",
+  "output-type":"waylandsink",
+  "detection-model": "yolox_quantized.tflite",
+  "detection-labels": "yolox.json",
+  "classification-model": "inception_v3_quantized.tflite",
+  "classification-labels": "classification.json"
+}
