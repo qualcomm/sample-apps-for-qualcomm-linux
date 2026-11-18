@@ -1,0 +1,7 @@
+{
+  "file-path": "video.mp4",
+  "model": "yolox_quantized.tflite",
+  "labels": "yolox.json",
+  "threshold": 40,
+  "runtime": "cpu"
+}
