@@ -496,6 +496,16 @@ main() {
     download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video1.mp4" "${output_media_path}/video1.mp4" "$force"
     download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video-flac.mp4" "${output_media_path}/video-flac.mp4" "$force"
     download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video-mp3.mp4" "${output_media_path}/video-mp3.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/audio.flac" "${output_media_path}/audio.flac" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/audio.mp3" "${output_media_path}/audio.mp3" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/audio.wav" "${output_media_path}/audio.wav" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/avc_flac.mp4" "${output_media_path}/avc_flac.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/avc_mp3.mp4" "${output_media_path}/avc_mp3.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/hevc_flac.mp4" "${output_media_path}/hevc_flac.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/hevc_mp3.mp4" "${output_media_path}/hevc_mp3.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video_avc.mp4" "${output_media_path}/video_avc.mp4" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/imagefiles_0.jpg" "${output_media_path}/imagefiles_0.jpg" "$force"
+    download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/imagefiles_1.jpg" "${output_media_path}/imagefiles_1.jpg" "$force"
 
 
     # Creates copies of the video1.mp4 file 
