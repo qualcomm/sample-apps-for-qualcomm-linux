@@ -359,18 +359,11 @@ download_model_artifacts() {
     output_label_path="${base_dir}/labels"
     output_data_path="${base_dir}/data"
     output_media_path="${base_dir}/media"
-    gesture_model_path="${home_dir}/models"
-    gesture_label_path="${home_dir}/labels"
 
     create_directory "$output_model_path"
     create_directory "$output_label_path"
     create_directory "$output_data_path"
     create_directory "$output_media_path"
-
-    if [ "$qdemo" != "true" ]; then
-        create_directory "$gesture_model_path"
-        create_directory "$gesture_label_path"
-    fi
 
     #tflite models
     download_from_zip "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/inception_v3/releases/${model_version}/inception_v3-tflite-w8a8.zip" "${output_model_path}/inception_v3_quantized.tflite" "$force"
@@ -390,9 +383,10 @@ download_model_artifacts() {
     if [ "$qdemo" != "true" ]; then
         download_file "https://huggingface.co/qualcomm/Facial-Attribute-Detection/resolve/228624993581944d488f232ae50174795d489661/Facial-Attribute-Detection_w8a8.tflite" "${output_model_path}/face_attrib_net_quantized.tflite" "$force"
         download_file "https://huggingface.co/qualcomm/YamNet/resolve/4167a3af6245a2b611c9f7918fddefd8b0de52dc/YamNet.tflite" "${output_model_path}/yamnet.tflite" "$force"
-        download_gesture_recognizer_models "$gesture_model_path" "$force"
-        download_gesture_recognizer_labels "$gesture_label_path" "$force"
     fi
+
+    download_gesture_recognizer_models "$output_model_path" "$force"
+    download_gesture_recognizer_labels "$output_label_path" "$force"
 
     #dlc models
     if [ "$qdemo" != "true" ]; then
@@ -454,8 +448,8 @@ main() {
     extract_chipset
 
     if [ "$build_type" = "Ubuntu" ] || [ "$build_type" = "Debian" ]; then
-        apt update
-        apt install -y unzip curl
+        sudo apt update
+        sudo apt install -y unzip curl
     fi
 
     download_model_artifacts "$force"
@@ -487,6 +481,16 @@ main() {
     if [ "$qdemo" != "true" ]; then
         download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video-flac.mp4" "${output_media_path}/video-flac.mp4" "$force"
         download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video-mp3.mp4" "${output_media_path}/video-mp3.mp4" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/audio.flac" "${output_media_path}/audio.flac" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/audio.mp3" "${output_media_path}/audio.mp3" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/audio.wav" "${output_media_path}/audio.wav" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/avc_flac.mp4" "${output_media_path}/avc_flac.mp4" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/avc_mp3.mp4" "${output_media_path}/avc_mp3.mp4" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/hevc_flac.mp4" "${output_media_path}/hevc_flac.mp4" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/hevc_mp3.mp4" "${output_media_path}/hevc_mp3.mp4" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/video_avc.mp4" "${output_media_path}/video_avc.mp4" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/imagefiles_0.jpg" "${output_media_path}/imagefiles_0.jpg" "$force"
+        download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/qualcomm-linux/artifacts/videos/imagefiles_1.jpg" "${output_media_path}/imagefiles_1.jpg" "$force"
     fi
 
     # Creates copies of the video1.mp4 file
