@@ -116,7 +116,7 @@ split_qairt_version() {
 }
 
 extract_home_dir() {
-    home_dir=$(eval echo $HOME)
+    home_dir=$(eval echo ~)
 }
 
 # Mapping of the QAIRT Version and its supported Model Version on AI HUB
@@ -460,7 +460,6 @@ main() {
     if [ "$qdemo" != "true" ]; then
         if [ "$build_type" = "QLI" ]; then
             download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/json_labels/facemap_3dmm_settings_linux.json" "${output_label_path}/facemap_3dmm_settings.json" "true"
-            echo "HOME"
         elif [ "$build_type" = "Debian" ]; then
             download_file "https://raw.githubusercontent.com/qualcomm/sample-apps-for-qualcomm-linux/refs/heads/main/artifacts/json_labels/facemap_3dmm_settings_debian.json" "${output_label_path}/facemap_3dmm_settings.json" "true"
         else
